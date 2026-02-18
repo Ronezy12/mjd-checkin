@@ -1,225 +1,34 @@
-
 <!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin — CTeen Check-in</title>
+
+  <!-- CSS centralisé -->
   <link rel="stylesheet" href="./css/style.css">
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
- 
-    }
-    *{box-sizing:border-box}
-    html{-webkit-text-size-adjust:100%}
-    
-    <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
-</script>
-    body{
-      
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
-        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
-        var(--bg);
-    }
-    .wrap{
-      max-width: 980px;
-      margin:0 auto;
-      padding:
-        calc(16px + env(safe-area-inset-top))
-        calc(16px + env(safe-area-inset-right))
-        calc(24px + env(safe-area-inset-bottom))
-        calc(16px + env(safe-area-inset-left));
-    }
-
-    .topbar{
-      position: sticky;
-      top: 10px;
-      z-index: 10;
-      border:1px solid var(--line);
-      background: rgba(15,27,51,.82);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      padding: 12px 12px;
-      backdrop-filter: blur(10px);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .brand{display:flex; flex-direction:column; gap:4px}
-    .brand .title{font-weight:900; letter-spacing:.2px}
-    .brand .sub{color:var(--muted); font-size:12px}
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.35);
-      color: var(--muted);
-      font-weight:800;
-      font-size:13px;
-    }
-    .dot{width:10px;height:10px;border-radius:999px;background:rgba(234,240,255,.35)}
-    .dot.ok{background:var(--ok)}
-    .dot.bad{background:var(--bad)}
-
-    .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .btn{
-      height: var(--tap);
-      padding: 0 14px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(47,107,255,.22);
-      color: var(--text);
-      font-weight: 900;
-      cursor: pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      text-decoration:none;
-      user-select:none;
-    }
-    .btn.orange{background: rgba(255,138,31,.22)}
-    .btn.ghost{background: rgba(0,0,0,.14)}
-    .btn:active{transform: translateY(1px)}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    @media(max-width: 900px){ .grid{grid-template-columns:1fr} }
-
-    .card{
-      border:1px solid var(--line);
-      background: rgba(15,27,51,.82);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      backdrop-filter: blur(10px);
-    }
-    .card h2{margin:0 0 6px; font-size:16px}
-    .hint{margin:0; color:var(--muted); font-size:13px; line-height:1.35}
-
-    .field{
-      width:100%;
-      height: var(--tap);
-      margin-top:10px;
-      padding: 0 14px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.35);
-      color:var(--text);
-      outline:none;
-    }
-    .field::placeholder{color:rgba(234,240,255,.55)}
-    .field:focus{
-      border-color: rgba(47,107,255,.45);
-      box-shadow: 0 0 0 3px rgba(47,107,255,.20);
-    }
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .row > *{flex:1; min-width: 180px}
-    .row .btn{flex:0; min-width: 160px}
-
-    .msg{margin-top:10px; font-size:13px}
-    .msg.ok{color:var(--ok)}
-    .msg.bad{color:var(--bad)}
-    .msg.muted{color:var(--muted)}
-
-    /* Desktop table */
-    .tableWrap{overflow:auto; margin-top:12px}
-    table{width:100%; border-collapse: collapse; min-width: 680px}
-    th,td{border-bottom:1px solid var(--line); padding:12px 10px; text-align:left}
-    th{color:var(--muted); font-size:12px; letter-spacing:.35px; text-transform:uppercase}
-    tr:hover td{background: rgba(11,18,32,.20)}
-    .name{font-weight:900}
-    .num{font-variant-numeric: tabular-nums}
-    .qrImg{
-      width:86px;height:86px;border-radius:16px;
-      border:1px solid var(--line);
-      background:#fff;
-    }
-    .miniLink{font-size:13px}
-
-    /* Mobile cards */
-    .cards{display:none; margin-top:12px; gap:12px}
-    .sCard{
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.35);
-      border-radius: 16px;
-      padding: 12px;
-    }
-    .sTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
-    .sName{font-weight:900}
-    .sMeta{color:var(--muted); font-size:13px; margin-top:6px}
-    .sActions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
-    .sActions a{
-      height:44px; padding:0 12px; border-radius:12px;
-      border:1px solid var(--line);
-      background: rgba(47,107,255,.18);
-      color: var(--text);
-      display:inline-flex; align-items:center; justify-content:center;
-      text-decoration:none; font-weight:900;
-    }
-
-    @media(max-width: 760px){
-      .tableWrap{display:none}
-      .cards{display:flex; flex-direction:column}
-    }
-
-    /* Sticky bottom action on mobile */
-    .bottomBar{
-      position: fixed;
-      left: 0; right: 0;
-      bottom: 0;
-      padding:
-        10px
-        calc(10px + env(safe-area-inset-right))
-        calc(10px + env(safe-area-inset-bottom))
-        calc(10px + env(safe-area-inset-left));
-      background: linear-gradient(180deg, transparent, rgba(11,18,32,.85));
-      display:none;
-      z-index: 20;
-    }
-    .bottomBar .inner{
-      max-width: var(--max);
-      margin: 0 auto;
-      display:flex;
-      gap:10px;
-    }
-    .bottomBar .inner a, .bottomBar .inner button{flex:1}
-    @media(max-width: 760px){
-      .bottomBar{display:block}
-      .wrap{padding-bottom: calc(92px + env(safe-area-inset-bottom))}
-    }
-  </style>
 </head>
-<body>
 
+<body>
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
       <div class="title">CTeen — Admin</div>
       <div class="sub">Gestion • QR • Présences</div>
     </div>
+
     <div class="actions">
-      <span class="pill" id="pill"><span class="dot" id="dot"></span><span id="pillText">Non connecté</span></span>
+      <span class="pill" id="pill">
+        <span class="dot" id="dot"></span>
+        <span id="pillText">Non connecté</span>
+      </span>
       <a class="btn ghost" href="./scan.html" id="goScan" style="display:none;">📷 Scanner</a>
       <button class="btn orange" id="btnLogout" style="display:none;">Déconnexion</button>
     </div>
@@ -229,7 +38,7 @@
     <!-- Login -->
     <section class="card" id="loginBox">
       <h2>Connexion admin</h2>
-      <p class="hint">Connecte-toi pour créer des étudiants et accéder au scan.</p>
+      <p class="hint">Connecte-toi pour accéder au scan et au dashboard.</p>
 
       <input class="field" id="email" type="email" placeholder="Email"
              autocomplete="email" inputmode="email" enterkeyhint="next">
@@ -245,15 +54,17 @@
       <p class="msg" id="loginMsg"></p>
     </section>
 
-    <!-- Create student -->
+    <!-- Admin tools -->
     <section class="card" id="adminBox" style="display:none;">
-      <h2>Créer un étudiant</h2>
-      <p class="hint">Chaque étudiant obtient une carte avec QR (à présenter à l’admin).</p>
+      <h2>Outils admin</h2>
+      <p class="hint">
+        Les étudiants créent leur compte via <b>signup.html</b>.
+        Ici tu gères la liste + l’accès scan.
+      </p>
 
-      <div class="row" style="margin-top:6px;">
-        <input class="field" id="firstName" placeholder="Prénom" autocomplete="given-name">
-        <input class="field" id="lastName" placeholder="Nom" autocomplete="family-name">
-        <button class="btn" id="btnCreate">Créer</button>
+      <div class="row" style="margin-top:10px;">
+        <input class="field" id="signupLink" readonly value="">
+        <button class="btn" id="btnCopy">Copier le lien</button>
       </div>
 
       <p class="msg muted" id="adminStatus"></p>
@@ -298,10 +109,17 @@
   </div>
 </div>
 
+<script>
+  // SW register (pas dans le <head>)
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+</script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
@@ -316,7 +134,7 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // UI elements
+  // UI refs
   const loginBox = document.getElementById("loginBox");
   const adminBox = document.getElementById("adminBox");
   const listBox  = document.getElementById("listBox");
@@ -331,6 +149,7 @@
   const loginMsg = document.getElementById("loginMsg");
   const adminStatus = document.getElementById("adminStatus");
 
+  // show password
   document.getElementById("showPass").addEventListener("change", (e)=>{
     document.getElementById("password").type = e.target.checked ? "text" : "password";
   });
@@ -352,15 +171,15 @@
     loginMsg.textContent = "Erreur: " + (e?.code ?? "") + " " + (e?.message ?? e);
   }
 
-  // Login
+  // login
   document.getElementById("btnLogin").onclick = async ()=>{
     loginMsg.className = "msg";
     loginMsg.textContent = "";
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
-    const btn = document.getElementById("btnLogin");
 
+    const btn = document.getElementById("btnLogin");
     btn.disabled = true;
     btn.textContent = "Connexion…";
     try{
@@ -373,41 +192,25 @@
     }
   };
 
-  async function doLogout(){
-    await signOut(auth);
-  }
+  async function doLogout(){ await signOut(auth); }
   btnLogout.onclick = doLogout;
   btnLogout2.onclick = doLogout;
 
-  // Create student (manual / legacy)
-  document.getElementById("btnCreate").onclick = async ()=>{
-    const firstName = document.getElementById("firstName").value.trim();
-    const lastName  = document.getElementById("lastName").value.trim();
-    if(!firstName || !lastName) return alert("Nom et prénom obligatoires.");
-
-    const btn = document.getElementById("btnCreate");
-    btn.disabled = true;
-    btn.textContent = "Création…";
-
-    try{
-      await addDoc(collection(db,"students"),{
-        firstName, lastName,
-        totalCheckins: 0,
-        lastCheckinDate: null,
-        createdAt: serverTimestamp()
-      });
-      document.getElementById("firstName").value = "";
-      document.getElementById("lastName").value = "";
-      await loadStudents();
-    }finally{
-      btn.disabled = false;
-      btn.textContent = "Créer";
-    }
+  // signup link (students self-create)
+  function setSignupLink(){
+    const base = location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
+    const link = base + "signup.html";
+    document.getElementById("signupLink").value = link;
+  }
+  document.getElementById("btnCopy").onclick = async ()=>{
+    const v = document.getElementById("signupLink").value;
+    try{ await navigator.clipboard.writeText(v); adminStatus.className="msg ok"; adminStatus.textContent="Lien copié ✅"; }
+    catch{ adminStatus.className="msg bad"; adminStatus.textContent="Copie impossible (navigateur)."; }
   };
 
   document.getElementById("btnRefresh").onclick = loadStudents;
 
-  // Load students (table + mobile cards)
+  // list students
   async function loadStudents(){
     const tbody = document.getElementById("students");
     const cards = document.getElementById("cards");
@@ -426,7 +229,6 @@
       const qrPayload = `SID:${docu.id}`;
       const qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`;
 
-      // Desktop row
       tbody.innerHTML += `
         <tr>
           <td class="name">${(d.lastName ?? "")} ${(d.firstName ?? "")}</td>
@@ -439,7 +241,6 @@
         </tr>
       `;
 
-      // Mobile card
       cards.innerHTML += `
         <div class="sCard">
           <div class="sTop">
@@ -457,7 +258,7 @@
     });
   }
 
-  // Auth state
+  // auth state
   onAuthStateChanged(auth, async (user)=>{
     if(!user){
       setPill("", "Non connecté");
@@ -501,11 +302,11 @@
     adminBox.style.display = "block";
     listBox.style.display  = "block";
 
+    setSignupLink();
     adminStatus.className = "msg ok";
     adminStatus.textContent = "Connecté ✅";
     await loadStudents();
   });
 </script>
-
 </body>
 </html>
