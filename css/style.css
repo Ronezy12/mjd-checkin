@@ -667,3 +667,14 @@ code{ color:#b9ccff; }
   .btn, .bottomMe, .bottomBar, .overlay{ display:none !important; }
   .card, .pane{ box-shadow:none !important; backdrop-filter:none !important; }
 }
+
+/* Centre la partie login/admin sur mobile */
+.adminCenter{
+   display:flex;
+   justify-content:center;
+{ 
+
+.adminCenter > .grid{
+   width:100%;
+   max-widht: 560px 
+}
