@@ -1,88 +1,271 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Scan</title>
-<style>
-body{font-family:Arial;margin:20px}
-.ok{color:green}
-.bad{color:red}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scan — CTeen</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#0f1b33; --line:rgba(255,255,255,.10);
+      --text:#eaf0ff; --muted:rgba(234,240,255,.72);
+      --blue:#2f6bff; --orange:#ff8a1f;
+      --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b;
+      --shadow: 0 16px 50px rgba(0,0,0,.35); --r:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
+        var(--bg);
+    }
+    .wrap{max-width:900px;margin:0 auto;padding:22px 16px 40px}
+    .top{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;
+      padding:14px 14px; border:1px solid var(--line);
+      background: rgba(15,27,51,.78); border-radius:var(--r);
+      box-shadow:var(--shadow); backdrop-filter: blur(10px);
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:999px;
+      border:1px solid var(--line); background: rgba(0,0,0,.18);
+      font-weight:900;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,var(--blue),var(--orange))}
+    .btn{
+      appearance:none; border:1px solid var(--line);
+      padding:10px 12px; border-radius:14px;
+      background: rgba(47,107,255,.22);
+      color:var(--text); font-weight:900;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:10px;
+      text-decoration:none;
+    }
+    .btn.orange{background: rgba(255,138,31,.20)}
+    .btn.ghost{background: rgba(0,0,0,.12)}
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:12px; margin-top:12px}
+    @media(max-width:900px){ .grid{grid-template-columns:1fr} }
+    .card{
+      border:1px solid var(--line); background: rgba(15,27,51,.78);
+      border-radius:var(--r); box-shadow:var(--shadow);
+      padding:14px; backdrop-filter: blur(10px);
+    }
+    h1{margin:0 0 6px;font-size:18px}
+    p{margin:0;color:var(--muted);line-height:1.35}
+    #reader{width:100%;}
+    .status{
+      margin-top:10px; border:1px solid var(--line); background: rgba(11,18,32,.35);
+      border-radius:16px; padding:12px; font-size:14px;
+    }
+    .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    .field{
+      flex:1; min-width:180px;
+      border:1px solid var(--line); background: rgba(11,18,32,.35);
+      padding:10px 12px; border-radius:14px;
+      color:var(--text); outline:none;
+    }
+    .field::placeholder{color:rgba(234,240,255,.55)}
+    code{color:#b9ccff}
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="badge"><span class="dot"></span> CTeen — Scan Admin</div>
+        <h1>Scanner un QR étudiant</h1>
+        <p>Admin connecté requis. 1 validation max par étudiant et par jour.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn ghost" href="./admin.html">⬅ Dashboard</a>
+        <button class="btn orange" id="btnStart">📷 Démarrer</button>
+        <button class="btn" id="btnStop" disabled>⏹ Stop</button>
+      </div>
+    </div>
 
-<h1>Scan présence</h1>
-<p id="msg"></p>
+    <div class="grid">
+      <div class="card">
+        <div id="reader"></div>
+        <div class="status" id="msg">Statut : prêt.</div>
+      </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+      <div class="card">
+        <h1>Mode manuel</h1>
+        <p>Si la caméra bug, colle l’ID (ou <code>SID:xxxx</code>) ici.</p>
+        <div class="row">
+          <input class="field" id="manual" placeholder="SID:xxxx ou studentId" />
+          <button class="btn orange" id="btnManual">Valider</button>
+        </div>
+        <div class="status" id="last">Dernière validation : —</div>
+      </div>
+    </div>
+  </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
-  authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
-  projectId: "maison-des-jeunes-cteen-yerres",
-  storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
-  messagingSenderId: "473890667192",
-  appId: "1:473890667192:web:973af383f7319d2cdc124d"
-};
+  <script src="https://unpkg.com/html5-qrcode"></script>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-const params=new URLSearchParams(location.search);
-const sid=params.get("sid");
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
+      authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
+      projectId: "maison-des-jeunes-cteen-yerres",
+      storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
+      messagingSenderId: "473890667192",
+      appId: "1:473890667192:web:973af383f7319d2cdc124d"
+    };
 
-function today(){
-  const d=new Date();
-  return d.toISOString().split("T")[0];
-}
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-onAuthStateChanged(auth, async user=>{
-  if(!user){
-    msg.innerHTML="<span class='bad'>Non connecté</span>";
-    return;
-  }
+    const msg = document.getElementById("msg");
+    const last = document.getElementById("last");
+    const btnStart = document.getElementById("btnStart");
+    const btnStop = document.getElementById("btnStop");
+    const btnManual = document.getElementById("btnManual");
+    const manual = document.getElementById("manual");
 
-  const admin=await getDoc(doc(db,"admins",user.uid));
-  if(!admin.exists()){
-    msg.innerHTML="<span class='bad'>Non autorisé</span>";
-    return;
-  }
+    let currentUser = null;
+    let scanner = null;
+    let locked = false; // évite double trigger
 
-  if(!sid){
-    msg.innerHTML="<span class='bad'>ID manquant</span>";
-    return;
-  }
+    function setStatus(text, cls=""){
+      msg.className = "status " + cls;
+      msg.textContent = text;
+    }
 
-  const ref=doc(db,"students",sid);
-  const snap=await getDoc(ref);
-  if(!snap.exists()){
-    msg.innerHTML="<span class='bad'>Étudiant introuvable</span>";
-    return;
-  }
+    function todayISO(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
-  const data=snap.data();
-  if(data.lastCheckinDate===today()){
-    msg.innerHTML="<span class='bad'>Déjà validé aujourd'hui</span>";
-    return;
-  }
+    async function isAdmin(uid){
+      const snap = await getDoc(doc(db,"admins",uid));
+      return snap.exists();
+    }
 
-  await updateDoc(ref,{
-    totalCheckins:increment(1),
-    lastCheckinDate:today()
-  });
+    function parseSid(text){
+      const t = (text ?? "").trim();
+      if(!t) return null;
 
-  const newTotal=(data.totalCheckins||0)+1;
-  if(newTotal%20===0){
-    msg.innerHTML="<span class='ok'>Présence validée ✅ Récompense débloquée 🎁</span>";
-  }else{
-    msg.innerHTML="<span class='ok'>Présence validée ✅ Total: "+newTotal+"</span>";
-  }
-});
-</script>
+      // 1) format SID:xxxxx
+      if(t.toUpperCase().startsWith("SID:")) return t.slice(4).trim();
+
+      // 2) si c’est une URL, cherche sid=
+      try{
+        const u = new URL(t);
+        const sid = new URLSearchParams(u.search).get("sid");
+        if(sid) return sid;
+      }catch{}
+
+      // 3) sinon on prend brut
+      return t;
+    }
+
+    async function checkin(studentId){
+      if(locked) return;
+      locked = true;
+
+      try{
+        if(!currentUser) throw new Error("Non connecté.");
+        if(!(await isAdmin(currentUser.uid))) throw new Error("Non autorisé (pas admin).");
+        if(!studentId) throw new Error("ID étudiant manquant.");
+
+        const ref = doc(db,"students",studentId);
+        const snap = await getDoc(ref);
+        if(!snap.exists()) throw new Error("Étudiant introuvable.");
+
+        const data = snap.data();
+        const today = todayISO();
+
+        if(data.lastCheckinDate === today){
+          setStatus("Déjà validé aujourd’hui pour cet étudiant.", "warn");
+          last.textContent = "Dernière validation : refusée (déjà validé aujourd’hui)";
+          return;
+        }
+
+        await updateDoc(ref,{
+          totalCheckins: increment(1),
+          lastCheckinDate: today
+        });
+
+        const newTotal = (data.totalCheckins || 0) + 1;
+        const rewards = Math.floor(newTotal / 20);
+
+        if(newTotal % 20 === 0){
+          setStatus(`Validé ✅ Total: ${newTotal}. 🎁 Récompense débloquée !`, "ok");
+        }else{
+          setStatus(`Validé ✅ Total: ${newTotal}. Récompenses: x${rewards}`, "ok");
+        }
+        last.textContent = `Dernière validation : ${studentId} (total=${newTotal})`;
+      }catch(e){
+        setStatus("Erreur: " + (e?.message ?? e), "bad");
+        last.textContent = "Dernière validation : erreur";
+      }finally{
+        setTimeout(()=>{ locked=false; }, 900); // anti double scan
+      }
+    }
+
+    onAuthStateChanged(auth, async (user)=>{
+      currentUser = user;
+      if(!user){
+        setStatus("Non connecté. Connecte-toi via admin.html.", "bad");
+        return;
+      }
+      const ok = await isAdmin(user.uid);
+      if(!ok){
+        setStatus("Connecté mais non autorisé (UID absent de /admins).", "bad");
+        return;
+      }
+      setStatus("Admin connecté ✅ Appuie sur Démarrer et scanne un QR étudiant.", "");
+    });
+
+    btnManual.onclick = async ()=>{
+      const sid = parseSid(manual.value);
+      await checkin(sid);
+    };
+
+    btnStart.onclick = async ()=>{
+      if(!window.Html5Qrcode){
+        setStatus("Scanner non chargé (CDN).", "bad");
+        return;
+      }
+      btnStart.disabled = true;
+      btnStop.disabled = false;
+
+      scanner = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: 260 };
+
+      await scanner.start(
+        { facingMode: "environment" },
+        config,
+        async (decodedText) => {
+          const sid = parseSid(decodedText);
+          await checkin(sid);
+        },
+        () => {}
+      );
+    };
+
+    btnStop.onclick = async ()=>{
+      btnStop.disabled = true;
+      btnStart.disabled = false;
+      if(scanner){
+        await scanner.stop();
+        scanner.clear();
+      }
+      setStatus("Scanner stoppé.", "");
+    };
+  </script>
 </body>
 </html>
