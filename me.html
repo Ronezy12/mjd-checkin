@@ -13,6 +13,13 @@
   <style>
     :root{--bg:#0b1220;--card:#0f1b33;--line:rgba(255,255,255,.10);--text:#eaf0ff;--muted:rgba(234,240,255,.72);--blue:#2f6bff;--orange:#ff8a1f;--ok:#22c55e;--bad:#ef4444;--r:18px}
     *{box-sizing:border-box}
+    
+    <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+</script>
+    
     body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--text);
       background:radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
                  radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%), var(--bg);}
