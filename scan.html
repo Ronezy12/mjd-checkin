@@ -199,6 +199,11 @@
           lastCheckinDate: today
         });
 
+        await setDoc (doc(db, "publicStatus", studentId), {
+          lastScanAt: serverTimestamp(), 
+          text: "QR Scanné Hazak à toi Bon cours !"
+        }, { merge: true  });
+
         const newTotal = (data.totalCheckins || 0) + 1;
         const rewards = Math.floor(newTotal / 20);
 
