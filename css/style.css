@@ -43,13 +43,14 @@ body{
 
 /* Safe-area padding helpers */
 .wrap{
-  max-width: var(--max);
+  widht: 100%;
+  max-width: 560; 
   margin:0 auto;
   padding:
     calc(18px + env(safe-area-inset-top))
-    calc(16px + env(safe-area-inset-right))
+    16px;
     calc(24px + env(safe-area-inset-bottom))
-    calc(16px + env(safe-area-inset-left));
+    16px;
 }
 
 .center{
@@ -267,9 +268,8 @@ a:hover{ text-decoration:underline; }
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 12px;
+ 
 }
-@media(max-width: 900px){ .grid{ grid-template-columns:1fr; } }
 
 .row{
   display:flex;
