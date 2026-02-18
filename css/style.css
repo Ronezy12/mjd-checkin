@@ -235,7 +235,7 @@ a:hover{ text-decoration:underline; }
    ADMIN
    ========================================================= */
 .topbar{
-  position: auto;
+  position: sticky;
   top: 10px;
   z-index: 10;
   border:1px solid var(--line);
