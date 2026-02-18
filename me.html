@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CTeen — Mon espace</title>
+  <style>
+    :root{--bg:#0b1220;--card:#0f1b33;--line:rgba(255,255,255,.10);--text:#eaf0ff;--muted:rgba(234,240,255,.72);--blue:#2f6bff;--orange:#ff8a1f;--ok:#22c55e;--bad:#ef4444;--r:18px}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--text);
+      background:radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
+                 radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%), var(--bg);}
+    .wrap{max-width:820px;margin:0 auto;padding:22px 16px 40px}
+    .card{border:1px solid var(--line);background:rgba(15,27,51,.78);border-radius:var(--r);padding:16px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .btn{border:1px solid var(--line);padding:10px 12px;border-radius:14px;background:rgba(47,107,255,.22);color:var(--text);font-weight:900;cursor:pointer}
+    .btn.orange{background:rgba(255,138,31,.20)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    @media(max-width:720px){.grid{grid-template-columns:1fr}}
+    .qr{width:min(320px,80vw);aspect-ratio:1/1;border-radius:20px;border:1px solid var(--line);background:#fff;display:block}
+    .muted{color:var(--muted)}
+    .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+    @media(max-width:520px){.kpi{grid-template-columns:1fr}}
+    .box{border:1px solid var(--line);background:rgba(11,18,32,.35);border-radius:16px;padding:12px}
+    .label{font-size:12px;color:var(--muted)}
+    .val{font-size:18px;font-weight:900;margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="muted">CTeen — Mon espace</div>
+          <h1 id="name" style="margin:6px 0 0;">Chargement…</h1>
+          <div class="muted" id="email">—</div>
+        </div>
+        <div class="row">
+          <button class="btn" id="btnLogout">Déconnexion</button>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="box"><div class="label">Présences</div><div class="val" id="total">—</div></div>
+        <div class="box"><div class="label">Objectif</div><div class="val">20</div></div>
+        <div class="box"><div class="label">Récompenses</div><div class="val" id="rewards">—</div></div>
+      </div>
+
+      <div class="grid">
+        <div class="box">
+          <div class="label">Mon QR à présenter à l’admin</div>
+          <div style="display:flex;justify-content:center;padding:12px">
+            <img id="qr" class="qr" alt="QR étudiant" />
+          </div>
+          <div class="muted">Astuce : garde cette page ouverte pendant le cours.</div>
+        </div>
+
+        <div class="box">
+          <div class="label">Dernière validation</div>
+          <div class="val" id="last">—</div>
+          <div class="muted">Si tu es scanné aujourd’hui, ça s’affiche ici.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
+      authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
+      projectId: "maison-des-jeunes-cteen-yerres",
+      storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
+      messagingSenderId: "473890667192",
+      appId: "1:473890667192:web:973af383f7319d2cdc124d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    document.getElementById("btnLogout").onclick = async ()=> {
+      await signOut(auth);
+      location.href="./login.html";
+    };
+
+    function setQr(uid){
+      const payload = `SID:${uid}`;
+      const url = "https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=" + encodeURIComponent(payload);
+      const img = document.getElementById("qr");
+      img.src = url;
+      img.onerror = ()=> img.src = "https://quickchart.io/qr?size=520&text=" + encodeURIComponent(payload);
+    }
+
+    onAuthStateChanged(auth, (user)=>{
+      if(!user) return location.href="./login.html";
+
+      document.getElementById("email").textContent = user.email ?? "";
+      setQr(user.uid);
+
+      // écoute SON doc student (autorisé par rules)
+      onSnapshot(doc(db,"students",user.uid), (snap)=>{
+        if(!snap.exists()) return;
+        const d = snap.data();
+        document.getElementById("name").textContent = `${d.lastName ?? ""} ${d.firstName ?? ""}`.trim();
+        const total = d.totalCheckins ?? 0;
+        document.getElementById("total").textContent = String(total);
+        document.getElementById("rewards").textContent = String(Math.floor(total/20));
+        document.getElementById("last").textContent = d.lastCheckinDate ?? "—";
+      });
+    });
+  </script>
+</body>
+</html>
