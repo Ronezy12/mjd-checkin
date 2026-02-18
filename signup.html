@@ -4,38 +4,245 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CTeen — Inscription</title>
+
   <style>
-    :root{--bg:#0b1220;--card:#0f1b33;--line:rgba(255,255,255,.10);--text:#eaf0ff;--muted:rgba(234,240,255,.72);--blue:#2f6bff;--orange:#ff8a1f;--ok:#22c55e;--bad:#ef4444;--r:18px}
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--text);
-      background:radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
-                 radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%), var(--bg);}
-    .wrap{max-width:520px;margin:0 auto;padding:22px 16px 40px}
-    .card{border:1px solid var(--line);background:rgba(15,27,51,.78);border-radius:var(--r);padding:16px}
-    h1{margin:0 0 6px;font-size:18px} p{margin:0;color:var(--muted)}
-    .field{width:100%;margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(11,18,32,.35);color:var(--text);outline:none}
-    .btn{width:100%;margin-top:12px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(47,107,255,.22);color:var(--text);font-weight:900;cursor:pointer}
-    .btn.orange{background:rgba(255,138,31,.20)}
-    .msg{margin-top:10px} .ok{color:var(--ok)} .bad{color:var(--bad)}
-    a{color:#b9ccff;text-decoration:none}
+    :root{
+      --bg:#0b1220;
+      --card:#0f1b33;
+      --line:rgba(255,255,255,.10);
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.72);
+      --blue:#2f6bff;
+      --orange:#ff8a1f;
+      --ok:#22c55e;
+      --bad:#ef4444;
+      --warn:#f59e0b;
+      --shadow: 0 16px 50px rgba(0,0,0,.35);
+      --r:18px;
+      --tap:48px;
+      --max:560px;
+    }
+
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
+        var(--bg);
+    }
+
+    .wrap{
+      min-height: 100dvh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:
+        calc(18px + env(safe-area-inset-top))
+        calc(16px + env(safe-area-inset-right))
+        calc(24px + env(safe-area-inset-bottom))
+        calc(16px + env(safe-area-inset-left));
+    }
+
+    .card{
+      width: min(100%, var(--max));
+      border:1px solid var(--line);
+      background: rgba(15,27,51,.82);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 6px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.16);
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background:linear-gradient(135deg,var(--blue),var(--orange));
+    }
+
+    h1{margin:8px 0 6px; font-size:18px}
+    p{margin:0; color:var(--muted); line-height:1.35}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top: 8px;
+    }
+    @media(max-width:560px){ .grid{grid-template-columns:1fr} }
+
+    .field{
+      width:100%;
+      height: var(--tap);
+      margin-top:10px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(11,18,32,.35);
+      color:var(--text);
+      outline:none;
+    }
+    .field::placeholder{color:rgba(234,240,255,.55)}
+    .field:focus{
+      border-color: rgba(47,107,255,.45);
+      box-shadow: 0 0 0 3px rgba(47,107,255,.20);
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      font-size:13px;
+      user-select:none;
+    }
+    .toggle input{transform: scale(1.05)}
+
+    .btn{
+      width:100%;
+      height: var(--tap);
+      margin-top:12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(255,138,31,.22);
+      color: var(--text);
+      font-weight: 900;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn:disabled{opacity:.65; cursor:not-allowed}
+
+    .msg{
+      margin-top:10px;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .msg.bad{color:var(--bad)}
+    .msg.ok{color:var(--ok)}
+    .msg.warn{color:var(--warn)}
+    .msg.muted{color:var(--muted)}
+
+    .helper{
+      margin-top:10px;
+      padding:12px;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      background: rgba(11,18,32,.30);
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.35;
+    }
+
+    .links{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:13px;
+    }
+    a{color:#b9ccff; text-decoration:none; font-weight:900}
+    a:hover{text-decoration:underline}
+
+    .divider{
+      margin-top:12px;
+      height:1px;
+      background: var(--line);
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Inscription étudiant</h1>
-      <p>Crée ton compte pour obtenir ton QR et ton suivi.</p>
+      <div class="brand">
+        <div class="badge"><span class="dot"></span> CTeen</div>
+        <div style="color:var(--muted);font-size:12px;font-weight:800;">Inscription</div>
+      </div>
 
-      <input id="firstName" class="field" placeholder="Prénom" />
-      <input id="lastName" class="field" placeholder="Nom" />
-      <input id="email" class="field" type="email" placeholder="Email" />
-      <input id="password" class="field" type="password" placeholder="Mot de passe (6+)" />
+      <h1>Créer ton compte étudiant</h1>
+      <p>Tu obtiens ton QR + ton suivi de présences.</p>
 
-      <button id="btnSignup" class="btn orange">Créer mon compte</button>
-      <p class="msg" id="msg"></p>
+      <form id="form">
+        <div class="grid">
+          <div>
+            <input id="firstName" class="field" placeholder="Prénom"
+                   autocomplete="given-name" enterkeyhint="next" required>
+          </div>
+          <div>
+            <input id="lastName" class="field" placeholder="Nom"
+                   autocomplete="family-name" enterkeyhint="next" required>
+          </div>
+        </div>
 
-      <p style="margin-top:12px;color:var(--muted)">
-        Déjà inscrit ? <a href="./login.html">Se connecter</a>
-      </p>
+        <input id="email" class="field" type="email" placeholder="Email"
+               autocomplete="email" inputmode="email" enterkeyhint="next" required>
+
+        <input id="password" class="field" type="password" placeholder="Mot de passe (6+)"
+               autocomplete="new-password" enterkeyhint="next" required>
+
+        <input id="password2" class="field" type="password" placeholder="Confirmer le mot de passe"
+               autocomplete="new-password" enterkeyhint="go" required>
+
+        <div class="row">
+          <label class="toggle">
+            <input id="showPass" type="checkbox">
+            Afficher les mots de passe
+          </label>
+          <span class="msg muted" id="caps" style="display:none;">⚠️ Majuscule activée</span>
+        </div>
+
+        <div class="helper" id="pwdHint">
+          Conseil : utilise au moins 6 caractères. Mélanger lettres et chiffres est mieux.
+        </div>
+
+        <button id="btnSignup" class="btn" type="submit">Créer mon compte</button>
+        <p class="msg" id="msg"></p>
+      </form>
+
+      <div class="divider"></div>
+
+      <div class="links">
+        <span>Déjà inscrit ? <a href="./login.html">Se connecter</a></span>
+        <a href="./admin.html" style="opacity:.85;">Espace admin</a>
+      </div>
     </div>
   </div>
 
@@ -57,17 +264,82 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    const form = document.getElementById("form");
+    const firstNameEl = document.getElementById("firstName");
+    const lastNameEl = document.getElementById("lastName");
+    const emailEl = document.getElementById("email");
+    const passEl = document.getElementById("password");
+    const pass2El = document.getElementById("password2");
+    const showPass = document.getElementById("showPass");
     const msg = document.getElementById("msg");
-    function setMsg(text, cls=""){ msg.className = "msg " + cls; msg.textContent = text; }
+    const btn = document.getElementById("btnSignup");
+    const caps = document.getElementById("caps");
+    const pwdHint = document.getElementById("pwdHint");
 
-    document.getElementById("btnSignup").onclick = async () => {
+    function setMsg(text, kind=""){
+      msg.className = "msg " + kind;
+      msg.textContent = text;
+    }
+
+    // focus
+    firstNameEl.focus();
+
+    // show password
+    showPass.addEventListener("change", (e)=>{
+      const t = e.target.checked ? "text" : "password";
+      passEl.type = t;
+      pass2El.type = t;
+    });
+
+    // caps lock warning
+    function capsCheck(e){
+      if(e.getModifierState && e.getModifierState("CapsLock")){
+        caps.style.display = "inline";
+      }else{
+        caps.style.display = "none";
+      }
+    }
+    passEl.addEventListener("keyup", capsCheck);
+    pass2El.addEventListener("keyup", capsCheck);
+
+    // live password quality hint (simple)
+    passEl.addEventListener("input", ()=>{
+      const v = passEl.value || "";
+      const okLen = v.length >= 6;
+      const hasNum = /\d/.test(v);
+      const hasLetter = /[A-Za-z]/.test(v);
+
+      if(!v){
+        pwdHint.textContent = "Conseil : utilise au moins 6 caractères. Mélanger lettres et chiffres est mieux.";
+        pwdHint.style.borderColor = "var(--line)";
+        return;
+      }
+
+      if(okLen && hasNum && hasLetter){
+        pwdHint.textContent = "Mot de passe OK ✅";
+        pwdHint.style.borderColor = "rgba(34,197,94,.35)";
+      }else{
+        pwdHint.textContent = "Mot de passe un peu faible : vise 6+ caractères + lettres et chiffres.";
+        pwdHint.style.borderColor = "rgba(245,158,11,.35)";
+      }
+    });
+
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
       setMsg("");
-      const firstName = document.getElementById("firstName").value.trim();
-      const lastName = document.getElementById("lastName").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+
+      const firstName = firstNameEl.value.trim();
+      const lastName = lastNameEl.value.trim();
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+      const password2 = pass2El.value;
 
       if(!firstName || !lastName) return setMsg("Nom + prénom obligatoires.", "bad");
+      if(password.length < 6) return setMsg("Mot de passe trop court (6 caractères minimum).", "bad");
+      if(password !== password2) return setMsg("Les mots de passe ne correspondent pas.", "bad");
+
+      btn.disabled = true;
+      btn.textContent = "Création…";
 
       try{
         const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -83,11 +355,14 @@
         });
 
         setMsg("Compte créé ✅ Redirection…", "ok");
-        setTimeout(()=> location.href = "./me.html", 600);
-      }catch(e){
-        setMsg("Erreur: " + (e?.code ?? "") + " " + (e?.message ?? e), "bad");
+        setTimeout(()=> location.href = "./me.html", 700);
+      }catch(err){
+        setMsg("Erreur: " + (err?.code ?? "") + " " + (err?.message ?? err), "bad");
+      }finally{
+        btn.disabled = false;
+        btn.textContent = "Créer mon compte";
       }
-    };
+    });
   </script>
 </body>
 </html>
