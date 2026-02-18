@@ -162,7 +162,7 @@ document.getElementById("btnInvite").onclick = async ()=>{
 /* =========================
    LOAD STUDENTS (FIXED)
 ========================= */
-
+cards.innerHTML = `<div class="sCard"><div class="sName">Chargement...</div></div>`;
 async function loadStudents(){
 
   const tbody = document.getElementById("students");
@@ -172,8 +172,11 @@ async function loadStudents(){
     const snap = await getDocs(collection(db,"students"));
 
     if(snap.empty){
-      tbody.innerHTML = `
-        <tr>
+      cards.innerHTML = `
+        <div class="sCard">
+          <div class="sName">Aucun étudiant</div>
+          <div class="sMeta">Soit la liste est vide, soit tu n'as pas accès.</div>
+          
           <td colspan="4">Aucun étudiant trouvé.</td>
         </tr>
       `;
