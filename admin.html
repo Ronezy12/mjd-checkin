@@ -261,6 +261,7 @@
 
   // auth state
   onAuthStateChanged(auth, async (user)=>{
+    
     if(!user){
       setPill("", "Non connecté");
       goScan.style.display = "none";
@@ -270,6 +271,8 @@
       loginBox.style.display = "block";
       adminBox.style.display = "none";
       listBox.style.display  = "none";
+
+      grid.classicList.remove("two");
 
       adminStatus.textContent = "";
       document.getElementById("email").focus();
@@ -289,6 +292,8 @@
       adminBox.style.display = "none";
       listBox.style.display  = "none";
 
+      grid.classicList.remove("two");
+
       adminStatus.className = "msg bad";
       adminStatus.textContent = "Compte connecté mais pas admin (UID absent dans /admins).";
       return;
@@ -302,6 +307,8 @@
     loginBox.style.display = "none";
     adminBox.style.display = "block";
     listBox.style.display  = "block";
+
+    grid.classicList.add("two");
 
     setSignupLink();
     adminStatus.className = "msg ok";
