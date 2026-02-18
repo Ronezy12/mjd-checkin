@@ -1,9 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scan</title>
+<style>
+body{font-family:Arial;margin:20px}
+.ok{color:green}
+.bad{color:red}
+</style>
+</head>
+<body>
+
+<h1>Scan présence</h1>
+<p id="msg"></p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
   authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
   projectId: "maison-des-jeunes-cteen-yerres",
   storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
   messagingSenderId: "473890667192",
-  appId: "1:473890667192:web:973af383f7319d2cdc124d",
-  measurementId: "G-TF788MYR3N"
+  appId: "1:473890667192:web:973af383f7319d2cdc124d"
 };
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const params=new URLSearchParams(location.search);
+const sid=params.get("sid");
+
+function today(){
+  const d=new Date();
+  return d.toISOString().split("T")[0];
+}
+
+onAuthStateChanged(auth, async user=>{
+  if(!user){
+    msg.innerHTML="<span class='bad'>Non connecté</span>";
+    return;
+  }
+
+  const admin=await getDoc(doc(db,"admins",user.uid));
+  if(!admin.exists()){
+    msg.innerHTML="<span class='bad'>Non autorisé</span>";
+    return;
+  }
+
+  if(!sid){
+    msg.innerHTML="<span class='bad'>ID manquant</span>";
+    return;
+  }
+
+  const ref=doc(db,"students",sid);
+  const snap=await getDoc(ref);
+  if(!snap.exists()){
+    msg.innerHTML="<span class='bad'>Étudiant introuvable</span>";
+    return;
+  }
+
+  const data=snap.data();
+  if(data.lastCheckinDate===today()){
+    msg.innerHTML="<span class='bad'>Déjà validé aujourd'hui</span>";
+    return;
+  }
+
+  await updateDoc(ref,{
+    totalCheckins:increment(1),
+    lastCheckinDate:today()
+  });
+
+  const newTotal=(data.totalCheckins||0)+1;
+  if(newTotal%20===0){
+    msg.innerHTML="<span class='ok'>Présence validée ✅ Récompense débloquée 🎁</span>";
+  }else{
+    msg.innerHTML="<span class='ok'>Présence validée ✅ Total: "+newTotal+"</span>";
+  }
+});
+</script>
+</body>
+</html>
