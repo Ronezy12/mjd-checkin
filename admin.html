@@ -45,86 +45,88 @@
   <div class="adminGrid">
     <div class="grid">
 
-    <!-- COLONNE GAUCHE -->
-    <div class="adminLeft">
+      <!-- COLONNE GAUCHE -->
+      <div class="adminLeft">
 
-      <!-- LOGIN -->
-      <section class="card" id="loginBox">
-        <h2>Connexion admin</h2>
-        <p class="muted">Connecte-toi pour gérer les étudiants.</p>
+        <!-- LOGIN -->
+        <section class="card" id="loginBox">
+          <h2>Connexion admin</h2>
+          <p class="muted">Connecte-toi pour gérer les étudiants.</p>
 
-        <input class="field" id="email" type="email" placeholder="Email">
-        <input class="field" id="password" type="password" placeholder="Mot de passe">
+          <input class="field" id="email" type="email" placeholder="Email" autocomplete="email">
+          <input class="field" id="password" type="password" placeholder="Mot de passe" autocomplete="current-password">
 
-        <label class="toggle mt10">
-          <input id="showPass" type="checkbox">
-          Afficher le mot de passe
-        </label>
+          <label class="toggle mt10">
+            <input id="showPass" type="checkbox">
+            Afficher le mot de passe
+          </label>
 
-        <button class="btn orange w100 mt10" id="btnLogin">
-          Se connecter
-        </button>
+          <button class="btn orange w100 mt10" id="btnLogin">
+            Se connecter
+          </button>
 
-        <p class="msg" id="loginMsg"></p>
-      </section>
+          <p class="msg" id="loginMsg"></p>
+        </section>
 
-      <!-- CREATE STUDENT -->
-      <section class="card mt10" id="adminBox" style="display:none;">
-        <h2>Créer un étudiant</h2>
-        <p class="muted">Ajoute un étudiant manuellement.</p>
+        <!-- CREATE STUDENT -->
+        <section class="card mt10" id="adminBox" style="display:none;">
+          <h2>Créer un étudiant</h2>
+          <p class="muted">Ajoute un étudiant manuellement.</p>
 
-        <div class="row mt10">
-          <input class="field" id="firstName" placeholder="Prénom">
-          <input class="field" id="lastName" placeholder="Nom">
-        </div>
-
-        <button class="btn w100 mt10" id="btnCreate">
-          Créer
-        </button>
-
-        <p class="msg muted" id="adminStatus"></p>
-      </section>
-
-    </div>
-
-    <!-- COLONNE DROITE -->
-    <div class="adminList">
-
-      <section class="card" id="listBox" style="display:none;">
-        <div class="rowBetween">
-          <div>
-            <h2 class="h1">Étudiants</h2>
-            <p class="muted tiny">Tableau desktop • Cartes mobile</p>
+          <div class="row mt10">
+            <input class="field" id="firstName" placeholder="Prénom" autocomplete="given-name">
+            <input class="field" id="lastName" placeholder="Nom" autocomplete="family-name">
           </div>
 
-          <button class="btn ghost" id="btnRefresh">
-            ↻ Rafraîchir
+          <button class="btn w100 mt10" id="btnCreate">
+            Créer
           </button>
-        </div>
 
-        <!-- TABLE DESKTOP -->
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Présences</th>
-                <th>Récompenses</th>
-                <th>Carte (QR)</th>
-              </tr>
-            </thead>
-            <tbody id="students"></tbody>
-          </table>
-        </div>
+          <p class="msg muted" id="adminStatus"></p>
+        </section>
 
-        <!-- MOBILE CARDS -->
-        <div class="cards" id="cards"></div>
+      </div>
 
-      </section>
+      <!-- COLONNE DROITE -->
+      <div class="adminList">
+
+        <section class="card" id="listBox" style="display:none;">
+          <div class="rowBetween">
+            <div>
+              <h2 class="h1">Étudiants</h2>
+              <p class="muted tiny">Tableau desktop • Cartes mobile</p>
+            </div>
+
+            <button class="btn ghost" id="btnRefresh">
+              ↻ Rafraîchir
+            </button>
+          </div>
+
+          <!-- TABLE DESKTOP -->
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Présences</th>
+                  <th>Récompenses</th>
+                  <th>Carte (QR)</th>
+                </tr>
+              </thead>
+              <tbody id="students"></tbody>
+            </table>
+          </div>
+
+          <!-- MOBILE CARDS -->
+          <div class="cards" id="cards"></div>
+
+        </section>
+
+      </div>
 
     </div>
-
   </div>
+
 </div>
 
 <!-- BOTTOM BAR MOBILE -->
@@ -135,9 +137,214 @@
   </div>
 </div>
 
-<!-- ⚠️ GARDE TON SCRIPT FIREBASE ICI EXACTEMENT COMME TU L’AS -->
 <script type="module">
-  /* COLLE ICI TON SCRIPT FIREBASE EXACT */
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  // ✅ TON FIREBASE CONFIG (je remets celui que tu avais partout)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
+    authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
+    projectId: "maison-des-jeunes-cteen-yerres",
+    storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
+    messagingSenderId: "473890667192",
+    appId: "1:473890667192:web:973af383f7319d2cdc124d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // PWA SW (optionnel)
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+
+  // UI
+  const loginBox = document.getElementById("loginBox");
+  const adminBox = document.getElementById("adminBox");
+  const listBox  = document.getElementById("listBox");
+
+  const pillText = document.getElementById("pillText");
+  const dot = document.getElementById("dot");
+  const goScan = document.getElementById("goScan");
+  const btnLogout = document.getElementById("btnLogout");
+  const btnLogout2 = document.getElementById("btnLogout2");
+  const bottomBar = document.getElementById("bottomBar");
+
+  const loginMsg = document.getElementById("loginMsg");
+  const adminStatus = document.getElementById("adminStatus");
+
+  document.getElementById("showPass").addEventListener("change", (e)=>{
+    document.getElementById("password").type = e.target.checked ? "text" : "password";
+  });
+
+  function setPill(state, text){
+    pillText.textContent = text;
+    dot.classList.remove("ok","bad");
+    if(state==="ok") dot.classList.add("ok");
+    if(state==="bad") dot.classList.add("bad");
+  }
+
+  async function isAdmin(uid){
+    const snap = await getDoc(doc(db,"admins",uid));
+    return snap.exists();
+  }
+
+  function setLoginError(e){
+    loginMsg.className = "msg bad";
+    loginMsg.textContent = "Erreur: " + (e?.code ?? "") + " " + (e?.message ?? e);
+  }
+
+  // ✅ LOGIN
+  document.getElementById("btnLogin").onclick = async ()=>{
+    loginMsg.className = "msg";
+    loginMsg.textContent = "";
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const btn = document.getElementById("btnLogin");
+
+    btn.disabled = true;
+    btn.textContent = "Connexion…";
+    try{
+      await signInWithEmailAndPassword(auth, email, password);
+    }catch(e){
+      setLoginError(e);
+    }finally{
+      btn.disabled = false;
+      btn.textContent = "Se connecter";
+    }
+  };
+
+  async function doLogout(){
+    await signOut(auth);
+  }
+  btnLogout.onclick = doLogout;
+  btnLogout2.onclick = doLogout;
+
+  // ✅ CREATE STUDENT
+  document.getElementById("btnCreate").onclick = async ()=>{
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName  = document.getElementById("lastName").value.trim();
+    if(!firstName || !lastName) return alert("Nom et prénom obligatoires.");
+
+    const btn = document.getElementById("btnCreate");
+    btn.disabled = true;
+    btn.textContent = "Création…";
+
+    try{
+      await addDoc(collection(db,"students"),{
+        firstName, lastName,
+        totalCheckins: 0,
+        lastCheckinDate: null,
+        createdAt: serverTimestamp()
+      });
+      document.getElementById("firstName").value = "";
+      document.getElementById("lastName").value = "";
+      await loadStudents();
+    }finally{
+      btn.disabled = false;
+      btn.textContent = "Créer";
+    }
+  };
+
+  document.getElementById("btnRefresh").onclick = loadStudents;
+
+  // ✅ LIST STUDENTS
+  async function loadStudents(){
+    const tbody = document.getElementById("students");
+    const cards = document.getElementById("cards");
+    tbody.innerHTML = "";
+    cards.innerHTML = "";
+
+    const snap = await getDocs(collection(db,"students"));
+    const base = location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
+
+    snap.forEach(docu=>{
+      const d = docu.data();
+      const total = d.totalCheckins || 0;
+      const rewards = Math.floor(total/20);
+
+      const cardLink = `${base}student.html?sid=${encodeURIComponent(docu.id)}`;
+      const qrPayload = `SID:${docu.id}`;
+      const qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`;
+
+      tbody.innerHTML += `
+        <tr>
+          <td class="name">${(d.lastName ?? "")} ${(d.firstName ?? "")}</td>
+          <td class="num">${total}</td>
+          <td class="num">${rewards}</td>
+          <td>
+            <img class="qrImg" src="${qr}" alt="QR">
+            <div class="miniLink"><a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a></div>
+          </td>
+        </tr>
+      `;
+
+      cards.innerHTML += `
+        <div class="sCard">
+          <div class="sTop">
+            <div>
+              <div class="sName">${(d.lastName ?? "")} ${(d.firstName ?? "")}</div>
+              <div class="sMeta">Présences: <span class="num">${total}</span> • Récompenses: <span class="num">${rewards}</span></div>
+            </div>
+            <img class="qrImg" src="${qr}" alt="QR">
+          </div>
+          <div class="sActions">
+            <a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // ✅ AUTH STATE
+  onAuthStateChanged(auth, async (user)=>{
+    if(!user){
+      setPill("", "Non connecté");
+      goScan.style.display = "none";
+      btnLogout.style.display = "none";
+      bottomBar.style.display = "none";
+
+      loginBox.style.display = "block";
+      adminBox.style.display = "none";
+      listBox.style.display  = "none";
+
+      adminStatus.textContent = "";
+      return;
+    }
+
+    const ok = await isAdmin(user.uid);
+    if(!ok){
+      setPill("bad", "Non autorisé");
+      goScan.style.display = "none";
+      btnLogout.style.display = "inline-flex";
+      bottomBar.style.display = "block";
+
+      loginBox.style.display = "block";
+      adminBox.style.display = "none";
+      listBox.style.display  = "none";
+
+      adminStatus.className = "msg bad";
+      adminStatus.textContent = "Compte connecté mais pas admin (UID absent dans /admins).";
+      return;
+    }
+
+    setPill("ok", `Admin: ${user.email ?? user.uid}`);
+    goScan.style.display = "inline-flex";
+    btnLogout.style.display = "inline-flex";
+    bottomBar.style.display = "block";
+
+    loginBox.style.display = "none";
+    adminBox.style.display = "block";
+    listBox.style.display  = "block";
+
+    adminStatus.className = "msg ok";
+    adminStatus.textContent = "Connecté ✅";
+    await loadStudents();
+  });
 </script>
 
 </body>
