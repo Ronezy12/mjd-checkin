@@ -11,8 +11,10 @@
       --blue:#2f6bff; --orange:#ff8a1f;
       --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b;
       --shadow: 0 16px 50px rgba(0,0,0,.35); --r:18px;
+      --tap:48px;
     }
     *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
     body{
       margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color:var(--text);
@@ -21,7 +23,14 @@
         radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
         var(--bg);
     }
-    .wrap{max-width:900px;margin:0 auto;padding:22px 16px 40px}
+    .wrap{
+      max-width:900px;margin:0 auto;
+      padding:
+        calc(18px + env(safe-area-inset-top))
+        calc(16px + env(safe-area-inset-right))
+        calc(24px + env(safe-area-inset-bottom))
+        calc(16px + env(safe-area-inset-left));
+    }
     .top{
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;
       padding:14px 14px; border:1px solid var(--line);
@@ -37,17 +46,22 @@
     .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,var(--blue),var(--orange))}
     .btn{
       appearance:none; border:1px solid var(--line);
-      padding:10px 12px; border-radius:14px;
+      padding:0 12px; height:var(--tap); border-radius:14px;
       background: rgba(47,107,255,.22);
       color:var(--text); font-weight:900;
       cursor:pointer;
-      display:inline-flex; align-items:center; gap:10px;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
       text-decoration:none;
+      user-select:none;
     }
     .btn.orange{background: rgba(255,138,31,.20)}
     .btn.ghost{background: rgba(0,0,0,.12)}
+    .btn:active{transform:translateY(1px)}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+
     .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:12px; margin-top:12px}
     @media(max-width:900px){ .grid{grid-template-columns:1fr} }
+
     .card{
       border:1px solid var(--line); background: rgba(15,27,51,.78);
       border-radius:var(--r); box-shadow:var(--shadow);
@@ -65,10 +79,14 @@
     .field{
       flex:1; min-width:180px;
       border:1px solid var(--line); background: rgba(11,18,32,.35);
-      padding:10px 12px; border-radius:14px;
+      padding:0 12px; height:var(--tap); border-radius:14px;
       color:var(--text); outline:none;
     }
     .field::placeholder{color:rgba(234,240,255,.55)}
+    .field:focus{
+      border-color: rgba(47,107,255,.45);
+      box-shadow: 0 0 0 3px rgba(47,107,255,.20);
+    }
     code{color:#b9ccff}
   </style>
 </head>
@@ -84,6 +102,7 @@
         <a class="btn ghost" href="./admin.html">⬅ Dashboard</a>
         <button class="btn orange" id="btnStart">📷 Démarrer</button>
         <button class="btn" id="btnStop" disabled>⏹ Stop</button>
+        <button class="btn ghost" id="btnTorch" style="display:none;">🔦 Flash</button>
       </div>
     </div>
 
@@ -97,7 +116,7 @@
         <h1>Mode manuel</h1>
         <p>Si la caméra bug, colle l’ID (ou <code>SID:xxxx</code>) ici.</p>
         <div class="row">
-          <input class="field" id="manual" placeholder="SID:xxxx ou studentId" />
+          <input class="field" id="manual" placeholder="SID:xxxx ou studentId" inputmode="text" enterkeyhint="go" />
           <button class="btn orange" id="btnManual">Valider</button>
         </div>
         <div class="status" id="last">Dernière validation : —</div>
@@ -129,16 +148,25 @@
     const last = document.getElementById("last");
     const btnStart = document.getElementById("btnStart");
     const btnStop = document.getElementById("btnStop");
+    const btnTorch = document.getElementById("btnTorch");
     const btnManual = document.getElementById("btnManual");
     const manual = document.getElementById("manual");
 
     let currentUser = null;
     let scanner = null;
-    let locked = false; // évite double trigger
+    let locked = false;
+
+    // Anti re-scan instantané du même QR
+    let lastSid = null;
+    let lastSidAt = 0;
+
+    // Torch/flash
+    let torchOn = false;
 
     function setStatus(text, cls=""){
       msg.className = "status " + cls;
       msg.textContent = text;
+      if(cls === "ok" && "vibrate" in navigator) navigator.vibrate(60);
     }
 
     function todayISO(){
@@ -172,11 +200,28 @@
       return t;
     }
 
+    async function publishStudentMessage(studentId){
+      // nécessite rules publicStatus (read public, write admin)
+      await setDoc(doc(db, "publicStatus", studentId), {
+        lastScanAt: serverTimestamp(),
+        text: "QR scanné ✅ Hazak à toi, bon cours !"
+      }, { merge: true });
+    }
+
     async function checkin(studentId){
       if(locked) return;
       locked = true;
 
       try{
+        // anti boucle même QR (2.5s)
+        const now = Date.now();
+        if(studentId && studentId === lastSid && (now - lastSidAt) < 2500){
+          locked = false;
+          return;
+        }
+        lastSid = studentId;
+        lastSidAt = now;
+
         if(!currentUser) throw new Error("Non connecté.");
         if(!(await isAdmin(currentUser.uid))) throw new Error("Non autorisé (pas admin).");
         if(!studentId) throw new Error("ID étudiant manquant.");
@@ -199,10 +244,12 @@
           lastCheckinDate: today
         });
 
-        await setDoc (doc(db, "publicStatus", studentId), {
-          lastScanAt: serverTimestamp(), 
-          text: "QR Scanné Hazak à toi Bon cours !"
-        }, { merge: true  });
+        // message sur la page étudiant
+        try{
+          await publishStudentMessage(studentId);
+        }catch{
+          // si rules pas mises ou hors ligne, on ignore
+        }
 
         const newTotal = (data.totalCheckins || 0) + 1;
         const rewards = Math.floor(newTotal / 20);
@@ -213,11 +260,12 @@
           setStatus(`Validé ✅ Total: ${newTotal}. Récompenses: x${rewards}`, "ok");
         }
         last.textContent = `Dernière validation : ${studentId} (total=${newTotal})`;
+
       }catch(e){
         setStatus("Erreur: " + (e?.message ?? e), "bad");
         last.textContent = "Dernière validation : erreur";
       }finally{
-        setTimeout(()=>{ locked=false; }, 900); // anti double scan
+        setTimeout(()=>{ locked=false; }, 900);
       }
     }
 
@@ -238,6 +286,8 @@
     btnManual.onclick = async ()=>{
       const sid = parseSid(manual.value);
       await checkin(sid);
+      manual.value = "";
+      manual.blur();
     };
 
     btnStart.onclick = async ()=>{
@@ -260,15 +310,48 @@
         },
         () => {}
       );
+
+      // Torch si supporté
+      try{
+        const caps = await scanner.getRunningTrackCapabilities();
+        if(caps && ("torch" in caps)){
+          btnTorch.style.display = "inline-flex";
+        }else{
+          btnTorch.style.display = "none";
+        }
+      }catch{
+        btnTorch.style.display = "none";
+      }
+    };
+
+    btnTorch.onclick = async ()=>{
+      if(!scanner) return;
+      try{
+        torchOn = !torchOn;
+        await scanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
+        btnTorch.textContent = torchOn ? "🔦 Flash ON" : "🔦 Flash";
+      }catch{
+        setStatus("Flash non supporté sur cet appareil.", "warn");
+        btnTorch.style.display = "none";
+        torchOn = false;
+      }
     };
 
     btnStop.onclick = async ()=>{
       btnStop.disabled = true;
       btnStart.disabled = false;
-      if(scanner){
-        await scanner.stop();
-        scanner.clear();
-      }
+
+      try{
+        if(scanner){
+          await scanner.stop();
+          scanner.clear();
+        }
+      }catch{}
+
+      torchOn = false;
+      btnTorch.textContent = "🔦 Flash";
+      btnTorch.style.display = "none";
+
       setStatus("Scanner stoppé.", "");
     };
   </script>
