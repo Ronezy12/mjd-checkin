@@ -1,17 +1,65 @@
-<!doctype html>
+	<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CTeen</title>
+  <title>CTeen — Check-in & Suivi</title>
 
-  <!-- Redirection immédiate -->
-  <meta http-equiv="refresh" content="0; url=./login.html">
-
-  <script>
-    // fallback redirection
-    location.replace("./login.html");
-  </script>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-<body></body>
+
+<body>
+
+  <section class="hero">
+    <div class="hero-inner">
+
+      <div class="badge">
+        <span class="dot"></span> CTeen
+      </div>
+
+      <h1>
+        Le check-in intelligent<br>
+        pour les jeunes de Yerres
+      </h1>
+
+      <p class="lead">
+        QR personnel, validation instantanée, suivi des présences et récompenses.
+        Simple. Moderne. Sécurisé.
+      </p>
+
+      <div class="cta">
+        <a href="./signup.html" class="btn orange">Créer mon compte</a>
+        <a href="./login.html" class="btn">Se connecter</a>
+      </div>
+
+      <div class="sub">
+        Espace encadrant ?
+        <a href="./admin.html">Accès admin</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="features">
+
+    <div class="feature-card">
+      <h3>🎫 QR personnel</h3>
+      <p>Chaque étudiant possède son QR unique à présenter à l’admin.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>📊 Suivi automatique</h3>
+      <p>Les présences sont comptabilisées en temps réel.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>🎁 Système de récompenses</h3>
+      <p>1 récompense débloquée toutes les 20 présences.</p>
+    </div>
+
+  </section>
+
+</body>
 </html>
