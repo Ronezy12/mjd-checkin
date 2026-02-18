@@ -1,4 +1,4 @@
-const CACHE_NAME = "cteen-checkin-v2";
+const CACHE_NAME = "cteen-checkin-v3";
 
 const ASSETS = [
   "./",
