@@ -30,7 +30,13 @@
 
     *{box-sizing:border-box}
     html{-webkit-text-size-adjust:100%}
-
+    
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+</script>
+    
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
