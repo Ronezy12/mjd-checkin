@@ -42,8 +42,7 @@ body{
     var(--bg);
 }
 
-/* ---------- Generic wrappers (✅ CENTRÉ PARTOUT) ---------- */
-/* wrap = container “app-like” par défaut (login/signup/admin) */
+/* ---------- Generic wrappers ---------- */
 .wrap{
   width:100%;
   max-width: 980px;
@@ -55,7 +54,6 @@ body{
     calc(16px + env(safe-area-inset-left));
 }
 
-/* center = centre verticalement (utile login/signup) */
 .center{
   min-height: 100dvh;
   display:flex;
@@ -158,7 +156,7 @@ p{ margin:0; }
   box-shadow: 0 0 0 3px rgba(47,107,255,.20);
 }
 
-/* ---------- Rows / layouts ---------- */
+/* ---------- Layout helpers ---------- */
 .brandRow{
   display:flex;
   align-items:center;
@@ -175,6 +173,14 @@ p{ margin:0; }
   flex-wrap:wrap;
   margin-top:10px;
 }
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.row > *{ flex:1; min-width: 180px; }
 
 .toggle{
   display:flex;
@@ -232,8 +238,20 @@ a:hover{ text-decoration:underline; }
 }
 
 /* =========================================================
-   ADMIN
+   ADMIN (NEW LAYOUT: wrap-admin / adminGrid / adminLeft / adminList)
    ========================================================= */
+.wrap-admin{
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding:
+    calc(18px + env(safe-area-inset-top))
+    calc(16px + env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom))
+    calc(16px + env(safe-area-inset-left));
+}
+
+/* TOPBAR */
 .topbar{
   position: sticky;
   top: 10px;
@@ -254,6 +272,8 @@ a:hover{ text-decoration:underline; }
 .brand .title{ font-weight:900; letter-spacing:.2px; }
 .brand .sub{ color:var(--muted); font-size:12px; }
 
+.actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
 .pill{
   display:inline-flex;
   align-items:center;
@@ -273,25 +293,35 @@ a:hover{ text-decoration:underline; }
 .dot.ok{ background: var(--ok); }
 .dot.bad{ background: var(--bad); }
 
-.actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-
-/* ✅ Admin: toujours “app-like”, 1 colonne partout */
-.grid{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  margin-top:12px;
+/* ✅ GRID ADMIN: mobile centré, desktop 2 colonnes */
+.adminGrid{
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr; /* mobile */
+  gap: 12px;
+  justify-items: center;     /* ✅ centre la colonne */
 }
 
-.row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
+.adminLeft,
+.adminList{
+  width: 100%;
+  max-width: var(--max);     /* ✅ “app-like” */
 }
-.row > *{ flex:1; min-width: 180px; }
-.row .btn{ flex:0; min-width: 160px; }
 
+/* Desktop */
+@media (min-width: 980px){
+  .adminGrid{
+    grid-template-columns: 420px 1fr;
+    align-items: start;
+    justify-items: stretch;
+  }
+  .adminLeft,
+  .adminList{
+    max-width: none;
+  }
+}
+
+/* Table + cards */
 .tableWrap{ overflow:auto; margin-top:12px; }
 table{
   width:100%;
@@ -344,6 +374,7 @@ tr:hover td{ background: rgba(11,18,32,.20); }
   .cards{ display:flex; flex-direction:column; }
 }
 
+/* bottom bar mobile */
 .bottomBar{
   position: fixed;
   left: 0; right: 0;
@@ -367,7 +398,7 @@ tr:hover td{ background: rgba(11,18,32,.20); }
 .bottomBar .inner button{ flex:1; }
 @media(max-width: 760px){
   .bottomBar{ display:block; }
-  .wrap{ padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+  .wrap-admin{ padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
 }
 
 /* =========================================================
@@ -515,85 +546,9 @@ tr:hover td{ background: rgba(11,18,32,.20); }
   100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}
 }
 
-.bottomMe{
-  position: fixed;
-  left:0; right:0; bottom:0;
-  padding:
-    10px
-    calc(10px + env(safe-area-inset-right))
-    calc(10px + env(safe-area-inset-bottom))
-    calc(10px + env(safe-area-inset-left));
-  background: linear-gradient(180deg, transparent, rgba(11,18,32,.90));
-  z-index: 20;
-}
-.innerMe{
-  max-width:560px;
-  margin:0 auto;
-  display:flex;
-  gap:10px;
-}
-.innerMe .btn{ flex:1; }
-.spacerMe{ height: 90px; }
-
-.overlay{
-  position:fixed; inset:0;
-  background: rgba(0,0,0,.92);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:
-    calc(14px + env(safe-area-inset-top))
-    calc(14px + env(safe-area-inset-right))
-    calc(14px + env(safe-area-inset-bottom))
-    calc(14px + env(safe-area-inset-left));
-  z-index: 50;
-}
-.overlayInner{
-  width:min(560px, 92vw);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-}
-.qrBigFrame{
-  width:min(520px, 92vw);
-  background:#fff;
-  border-radius: 28px;
-  padding: 14px;
-  box-shadow: 0 18px 60px rgba(0,0,0,.45);
-}
-.qrBig{
-  width:100%;
-  aspect-ratio:1/1;
-  border-radius: 16px;
-  display:block;
-  background:#fff;
-}
-.overlayName{
-  text-align:center;
-  font-weight:900;
-  color: rgba(234,240,255,.92);
-}
-.overlaySub{
-  text-align:center;
-  color: rgba(234,240,255,.65);
-  font-size:13px;
-  line-height:1.35;
-}
-
 /* =========================================================
    STUDENT CARD
    ========================================================= */
-.topStudent{
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
-.brandStudent{ display:flex; flex-direction:column; gap:6px; }
-
 .studentGrid{
   margin-top:14px;
   display:grid;
@@ -664,17 +619,6 @@ code{ color:#b9ccff; }
 /* ---------- Print ---------- */
 @media print{
   body{ background:#fff; color:#000; }
-  .btn, .bottomMe, .bottomBar, .overlay{ display:none !important; }
+  .btn, .bottomBar{ display:none !important; }
   .card, .pane{ box-shadow:none !important; backdrop-filter:none !important; }
-}
-
-/* Centre la partie login/admin sur mobile */
-.adminCenter{
-   display:flex;
-   justify-content:center;
-{ 
-
-.adminCenter > .grid{
-   width:100%;
-   max-widht: 560px 
 }
