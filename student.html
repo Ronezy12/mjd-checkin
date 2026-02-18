@@ -159,29 +159,38 @@
       return location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
     }
 
-    async function main(){
-      if(!sid){
-        nameEl.textContent = "ID manquant";
-        sidEl.textContent = "—";
-        return;
-      }
-      sidEl.textContent = sid;
+    function setQrAlways(sid){
+  // QR encode juste SID:<id>
+  const payload = `SID:${sid}`;
+  const qr = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(payload)}`;
+  qrImg.src = qr;
+}
 
-      const snap = await getDoc(doc(db,"students",sid));
-      if(!snap.exists()){
-        nameEl.textContent = "Étudiant introuvable";
-        return;
-      }
-      const d = snap.data();
-      nameEl.textContent = `${d.lastName ?? ""} ${d.firstName ?? ""}`.trim();
+async function main(){
+  if(!sid){
+    nameEl.textContent = "ID manquant";
+    sidEl.textContent = "—";
+    return;
+  }
 
-      // QR encode juste un texte "SID:<id>" (simple, rapide à décoder côté admin)
-      const payload = `SID:${sid}`;
-      const qr = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(payload)}`;
-      qrImg.src = qr;
+  sidEl.textContent = sid;
+
+  // ✅ QR affiché quoi qu’il arrive
+  setQrAlways(sid);
+
+  // 🔒 Tentative d’afficher le nom (peut échouer si pas admin)
+  try{
+    const snap = await getDoc(doc(db,"students",sid));
+    if(!snap.exists()){
+      nameEl.textContent = "Étudiant introuvable";
+      return;
     }
+    const d = snap.data();
+    nameEl.textContent = `${d.lastName ?? ""} ${d.firstName ?? ""}`.trim() || "Étudiant";
+  }catch(e){
+    // Pas admin => permissions → on garde un affichage neutre
+    nameEl.textContent = "Carte étudiant";
+  }
+}
 
-    main();
-  </script>
-</body>
-</html>
+main();
