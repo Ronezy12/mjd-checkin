@@ -4,113 +4,28 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Scan — CTeen</title>
+
+  <!-- CSS centralisé -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <style>
-    :root{
-      --bg:#0b1220; --card:#0f1b33; --line:rgba(255,255,255,.10);
-      --text:#eaf0ff; --muted:rgba(234,240,255,.72);
-      --blue:#2f6bff; --orange:#ff8a1f;
-      --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b;
-      --shadow: 0 16px 50px rgba(0,0,0,.35); --r:18px;
-      --tap:48px;
-    }
-    *{box-sizing:border-box}
-    html{-webkit-text-size-adjust:100%}
-    
-    <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
-</script>
-    
-    body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
-        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
-        var(--bg);
-    }
-    .wrap{
-      max-width:900px;margin:0 auto;
-      padding:
-        calc(18px + env(safe-area-inset-top))
-        calc(16px + env(safe-area-inset-right))
-        calc(24px + env(safe-area-inset-bottom))
-        calc(16px + env(safe-area-inset-left));
-    }
-    .top{
-      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;
-      padding:14px 14px; border:1px solid var(--line);
-      background: rgba(15,27,51,.78); border-radius:var(--r);
-      box-shadow:var(--shadow); backdrop-filter: blur(10px);
-    }
-    .badge{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:10px 12px; border-radius:999px;
-      border:1px solid var(--line); background: rgba(0,0,0,.18);
-      font-weight:900;
-    }
-    .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,var(--blue),var(--orange))}
-    .btn{
-      appearance:none; border:1px solid var(--line);
-      padding:0 12px; height:var(--tap); border-radius:14px;
-      background: rgba(47,107,255,.22);
-      color:var(--text); font-weight:900;
-      cursor:pointer;
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      text-decoration:none;
-      user-select:none;
-    }
-    .btn.orange{background: rgba(255,138,31,.20)}
-    .btn.ghost{background: rgba(0,0,0,.12)}
-    .btn:active{transform:translateY(1px)}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
-
-    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:12px; margin-top:12px}
-    @media(max-width:900px){ .grid{grid-template-columns:1fr} }
-
-    .card{
-      border:1px solid var(--line); background: rgba(15,27,51,.78);
-      border-radius:var(--r); box-shadow:var(--shadow);
-      padding:14px; backdrop-filter: blur(10px);
-    }
-    h1{margin:0 0 6px;font-size:18px}
-    p{margin:0;color:var(--muted);line-height:1.35}
-    #reader{width:100%;}
-    .status{
-      margin-top:10px; border:1px solid var(--line); background: rgba(11,18,32,.35);
-      border-radius:16px; padding:12px; font-size:14px;
-    }
-    .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
-    .field{
-      flex:1; min-width:180px;
-      border:1px solid var(--line); background: rgba(11,18,32,.35);
-      padding:0 12px; height:var(--tap); border-radius:14px;
-      color:var(--text); outline:none;
-    }
-    .field::placeholder{color:rgba(234,240,255,.55)}
-    .field:focus{
-      border-color: rgba(47,107,255,.45);
-      box-shadow: 0 0 0 3px rgba(47,107,255,.20);
-    }
-    code{color:#b9ccff}
-  </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="top">
+  <div class="wrap wrap-scan">
+    <div class="scanTop">
       <div>
-        <div class="badge"><span class="dot"></span> CTeen — Scan Admin</div>
-        <h1>Scanner un QR étudiant</h1>
-        <p>Admin connecté requis. 1 validation max par étudiant et par jour.</p>
+        <div class="badge"><span class="brandDot"></span> CTeen — Scan Admin</div>
+        <h1 class="h1">Scanner un QR étudiant</h1>
+        <p class="muted">Admin connecté requis. 1 validation max par étudiant et par jour.</p>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+      <div class="scanActions">
         <a class="btn ghost" href="./admin.html">⬅ Dashboard</a>
         <button class="btn orange" id="btnStart">📷 Démarrer</button>
         <button class="btn" id="btnStop" disabled>⏹ Stop</button>
@@ -118,23 +33,32 @@
       </div>
     </div>
 
-    <div class="grid">
+    <div class="scanGrid">
       <div class="card">
         <div id="reader"></div>
         <div class="status" id="msg">Statut : prêt.</div>
       </div>
 
       <div class="card">
-        <h1>Mode manuel</h1>
-        <p>Si la caméra bug, colle l’ID (ou <code>SID:xxxx</code>) ici.</p>
-        <div class="row">
+        <h1 class="h1">Mode manuel</h1>
+        <p class="muted">Si la caméra bug, colle l’ID (ou <code>SID:xxxx</code>) ici.</p>
+
+        <div class="rowManual">
           <input class="field" id="manual" placeholder="SID:xxxx ou studentId" inputmode="text" enterkeyhint="go" />
           <button class="btn orange" id="btnManual">Valider</button>
         </div>
+
         <div class="status" id="last">Dernière validation : —</div>
       </div>
     </div>
   </div>
+
+  <!-- Service worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    }
+  </script>
 
   <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -198,22 +122,18 @@
       const t = (text ?? "").trim();
       if(!t) return null;
 
-      // 1) format SID:xxxxx
       if(t.toUpperCase().startsWith("SID:")) return t.slice(4).trim();
 
-      // 2) si c’est une URL, cherche sid=
       try{
         const u = new URL(t);
         const sid = new URLSearchParams(u.search).get("sid");
         if(sid) return sid;
       }catch{}
 
-      // 3) sinon on prend brut
       return t;
     }
 
     async function publishStudentMessage(studentId){
-      // nécessite rules publicStatus (read public, write admin)
       await setDoc(doc(db, "publicStatus", studentId), {
         lastScanAt: serverTimestamp(),
         text: "QR scanné ✅ Hazak à toi, bon cours !"
@@ -225,7 +145,6 @@
       locked = true;
 
       try{
-        // anti boucle même QR (2.5s)
         const now = Date.now();
         if(studentId && studentId === lastSid && (now - lastSidAt) < 2500){
           locked = false;
@@ -256,12 +175,7 @@
           lastCheckinDate: today
         });
 
-        // message sur la page étudiant
-        try{
-          await publishStudentMessage(studentId);
-        }catch{
-          // si rules pas mises ou hors ligne, on ignore
-        }
+        try{ await publishStudentMessage(studentId); }catch{}
 
         const newTotal = (data.totalCheckins || 0) + 1;
         const rewards = Math.floor(newTotal / 20);
