@@ -1,154 +1,514 @@
+
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin - MJD Check-in</title>
-<style>
-body{font-family:Arial;margin:20px;max-width:900px}
-input,button{padding:8px;margin:5px}
-table{width:100%;border-collapse:collapse;margin-top:15px}
-th,td{border:1px solid #ddd;padding:8px}
-.ok{color:green}
-.bad{color:red}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin — CTeen Check-in</title>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1b33;
+      --line:rgba(255,255,255,.10);
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.72);
+      --blue:#2f6bff;
+      --orange:#ff8a1f;
+      --ok:#22c55e;
+      --bad:#ef4444;
+      --shadow: 0 16px 50px rgba(0,0,0,.35);
+      --r:18px;
+      --tap:48px;
+      --max:560px;
+    }
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
+        var(--bg);
+    }
+    .wrap{
+      max-width: 980px;
+      margin:0 auto;
+      padding:
+        calc(16px + env(safe-area-inset-top))
+        calc(16px + env(safe-area-inset-right))
+        calc(24px + env(safe-area-inset-bottom))
+        calc(16px + env(safe-area-inset-left));
+    }
+
+    .topbar{
+      position: sticky;
+      top: 10px;
+      z-index: 10;
+      border:1px solid var(--line);
+      background: rgba(15,27,51,.82);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 12px 12px;
+      backdrop-filter: blur(10px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .brand{display:flex; flex-direction:column; gap:4px}
+    .brand .title{font-weight:900; letter-spacing:.2px}
+    .brand .sub{color:var(--muted); font-size:12px}
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(11,18,32,.35);
+      color: var(--muted);
+      font-weight:800;
+      font-size:13px;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;background:rgba(234,240,255,.35)}
+    .dot.ok{background:var(--ok)}
+    .dot.bad{background:var(--bad)}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{
+      height: var(--tap);
+      padding: 0 14px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(47,107,255,.22);
+      color: var(--text);
+      font-weight: 900;
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      text-decoration:none;
+      user-select:none;
+    }
+    .btn.orange{background: rgba(255,138,31,.22)}
+    .btn.ghost{background: rgba(0,0,0,.14)}
+    .btn:active{transform: translateY(1px)}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media(max-width: 900px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      border:1px solid var(--line);
+      background: rgba(15,27,51,.82);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+    .card h2{margin:0 0 6px; font-size:16px}
+    .hint{margin:0; color:var(--muted); font-size:13px; line-height:1.35}
+
+    .field{
+      width:100%;
+      height: var(--tap);
+      margin-top:10px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(11,18,32,.35);
+      color:var(--text);
+      outline:none;
+    }
+    .field::placeholder{color:rgba(234,240,255,.55)}
+    .field:focus{
+      border-color: rgba(47,107,255,.45);
+      box-shadow: 0 0 0 3px rgba(47,107,255,.20);
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row > *{flex:1; min-width: 180px}
+    .row .btn{flex:0; min-width: 160px}
+
+    .msg{margin-top:10px; font-size:13px}
+    .msg.ok{color:var(--ok)}
+    .msg.bad{color:var(--bad)}
+    .msg.muted{color:var(--muted)}
+
+    /* Desktop table */
+    .tableWrap{overflow:auto; margin-top:12px}
+    table{width:100%; border-collapse: collapse; min-width: 680px}
+    th,td{border-bottom:1px solid var(--line); padding:12px 10px; text-align:left}
+    th{color:var(--muted); font-size:12px; letter-spacing:.35px; text-transform:uppercase}
+    tr:hover td{background: rgba(11,18,32,.20)}
+    .name{font-weight:900}
+    .num{font-variant-numeric: tabular-nums}
+    .qrImg{
+      width:86px;height:86px;border-radius:16px;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+    .miniLink{font-size:13px}
+
+    /* Mobile cards */
+    .cards{display:none; margin-top:12px; gap:12px}
+    .sCard{
+      border:1px solid var(--line);
+      background: rgba(11,18,32,.35);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .sTop{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+    .sName{font-weight:900}
+    .sMeta{color:var(--muted); font-size:13px; margin-top:6px}
+    .sActions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    .sActions a{
+      height:44px; padding:0 12px; border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(47,107,255,.18);
+      color: var(--text);
+      display:inline-flex; align-items:center; justify-content:center;
+      text-decoration:none; font-weight:900;
+    }
+
+    @media(max-width: 760px){
+      .tableWrap{display:none}
+      .cards{display:flex; flex-direction:column}
+    }
+
+    /* Sticky bottom action on mobile */
+    .bottomBar{
+      position: fixed;
+      left: 0; right: 0;
+      bottom: 0;
+      padding:
+        10px
+        calc(10px + env(safe-area-inset-right))
+        calc(10px + env(safe-area-inset-bottom))
+        calc(10px + env(safe-area-inset-left));
+      background: linear-gradient(180deg, transparent, rgba(11,18,32,.85));
+      display:none;
+      z-index: 20;
+    }
+    .bottomBar .inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      display:flex;
+      gap:10px;
+    }
+    .bottomBar .inner a, .bottomBar .inner button{flex:1}
+    @media(max-width: 760px){
+      .bottomBar{display:block}
+      .wrap{padding-bottom: calc(92px + env(safe-area-inset-bottom))}
+    }
+  </style>
 </head>
 <body>
 
-<h1>Admin</h1>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="title">CTeen — Admin</div>
+      <div class="sub">Gestion • QR • Présences</div>
+    </div>
+    <div class="actions">
+      <span class="pill" id="pill"><span class="dot" id="dot"></span><span id="pillText">Non connecté</span></span>
+      <a class="btn ghost" href="./scan.html" id="goScan" style="display:none;">📷 Scanner</a>
+      <button class="btn orange" id="btnLogout" style="display:none;">Déconnexion</button>
+    </div>
+  </div>
 
-<div id="loginBox">
-  <h3>Connexion</h3>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Mot de passe">
-  <button onclick="login()">Se connecter</button>
-  <p id="loginMsg"></p>
+  <div class="grid">
+    <!-- Login -->
+    <section class="card" id="loginBox">
+      <h2>Connexion admin</h2>
+      <p class="hint">Connecte-toi pour créer des étudiants et accéder au scan.</p>
+
+      <input class="field" id="email" type="email" placeholder="Email"
+             autocomplete="email" inputmode="email" enterkeyhint="next">
+      <input class="field" id="password" type="password" placeholder="Mot de passe"
+             autocomplete="current-password" enterkeyhint="go">
+
+      <label style="display:flex;gap:10px;align-items:center;margin-top:10px;color:var(--muted);font-size:13px;">
+        <input id="showPass" type="checkbox">
+        Afficher le mot de passe
+      </label>
+
+      <button class="btn orange" id="btnLogin">Se connecter</button>
+      <p class="msg" id="loginMsg"></p>
+    </section>
+
+    <!-- Create student -->
+    <section class="card" id="adminBox" style="display:none;">
+      <h2>Créer un étudiant</h2>
+      <p class="hint">Chaque étudiant obtient une carte avec QR (à présenter à l’admin).</p>
+
+      <div class="row" style="margin-top:6px;">
+        <input class="field" id="firstName" placeholder="Prénom" autocomplete="given-name">
+        <input class="field" id="lastName" placeholder="Nom" autocomplete="family-name">
+        <button class="btn" id="btnCreate">Créer</button>
+      </div>
+
+      <p class="msg muted" id="adminStatus"></p>
+    </section>
+  </div>
+
+  <!-- List -->
+  <section class="card" id="listBox" style="display:none; margin-top:12px;">
+    <div class="row" style="justify-content:space-between; align-items:center;">
+      <div style="flex:1; min-width:200px">
+        <h2 style="margin:0;">Étudiants</h2>
+        <p class="hint">Desktop : tableau • Mobile : cartes</p>
+      </div>
+      <div style="flex:0">
+        <button class="btn ghost" id="btnRefresh">↻ Rafraîchir</button>
+      </div>
+    </div>
+
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Présences</th>
+            <th>Récompenses</th>
+            <th>Carte (QR)</th>
+          </tr>
+        </thead>
+        <tbody id="students"></tbody>
+      </table>
+    </div>
+
+    <div class="cards" id="cards"></div>
+  </section>
 </div>
 
-<div id="adminBox" style="display:none">
-  <p id="adminStatus"></p>
-  <button onclick="logout()">Déconnexion</button>
-
-  <h3>Créer un étudiant</h3>
-  <input id="firstName" placeholder="Prénom">
-  <input id="lastName" placeholder="Nom">
-  <button onclick="createStudent()">Créer</button>
-
-  <h3>Liste étudiants</h3>
-  <button onclick="loadStudents()">Rafraîchir</button>
-  <table>
-    <thead>
-      <tr>
-        <th>Nom</th>
-        <th>Présences</th>
-        <th>QR</th>
-      </tr>
-    </thead>
-    <tbody id="students"></tbody>
-  </table>
+<!-- Mobile sticky actions -->
+<div class="bottomBar" id="bottomBar" style="display:none;">
+  <div class="inner">
+    <a class="btn ghost" href="./scan.html">📷 Scanner</a>
+    <button class="btn orange" id="btnLogout2">Déconnexion</button>
+  </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
-  authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
-  projectId: "maison-des-jeunes-cteen-yerres",
-  storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
-  messagingSenderId: "473890667192",
-  appId: "1:473890667192:web:973af383f7319d2cdc124d"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
+    authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
+    projectId: "maison-des-jeunes-cteen-yerres",
+    storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
+    messagingSenderId: "473890667192",
+    appId: "1:473890667192:web:973af383f7319d2cdc124d"
+  };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-window.login = async function(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  try{
-    await signInWithEmailAndPassword(auth,email,password);
-  }catch(e){
-    document.getElementById("loginMsg").innerText="Erreur connexion";
-  }
-}
+  // UI elements
+  const loginBox = document.getElementById("loginBox");
+  const adminBox = document.getElementById("adminBox");
+  const listBox  = document.getElementById("listBox");
 
-window.logout = async function(){
-  await signOut(auth);
-}
+  const pillText = document.getElementById("pillText");
+  const dot = document.getElementById("dot");
+  const goScan = document.getElementById("goScan");
+  const btnLogout = document.getElementById("btnLogout");
+  const btnLogout2 = document.getElementById("btnLogout2");
+  const bottomBar = document.getElementById("bottomBar");
 
-async function isAdmin(uid){
-  const snap = await getDoc(doc(db,"admins",uid));
-  return snap.exists();
-}
+  const loginMsg = document.getElementById("loginMsg");
+  const adminStatus = document.getElementById("adminStatus");
 
-onAuthStateChanged(auth, async (user)=>{
-  if(!user){
-    loginBox.style.display="block";
-    adminBox.style.display="none";
-    return;
-  }
-
-  if(await isAdmin(user.uid)){
-    loginBox.style.display="none";
-    adminBox.style.display="block";
-    adminStatus.innerHTML="<span class='ok'>ADMIN connecté</span>";
-    loadStudents();
-  }else{
-    adminStatus.innerHTML="<span class='bad'>Non autorisé</span>";
-  }
-});
-
-window.createStudent = async function(){
-  const firstName=document.getElementById("firstName").value;
-  const lastName=document.getElementById("lastName").value;
-  if(!firstName||!lastName)return alert("Nom et prénom obligatoires");
-
-  await addDoc(collection(db,"students"),{
-    firstName,lastName,
-    totalCheckins:0,
-    lastCheckinDate:null,
-    createdAt:serverTimestamp()
+  document.getElementById("showPass").addEventListener("change", (e)=>{
+    document.getElementById("password").type = e.target.checked ? "text" : "password";
   });
 
-  alert("Étudiant créé");
-  loadStudents();
-}
+  function setPill(state, text){
+    pillText.textContent = text;
+    dot.classList.remove("ok","bad");
+    if(state==="ok") dot.classList.add("ok");
+    if(state==="bad") dot.classList.add("bad");
+  }
 
-window.loadStudents = async function(){
-  const tbody=document.getElementById("students");
-  tbody.innerHTML="";
-  const snap=await getDocs(collection(db,"students"));
+  async function isAdmin(uid){
+    const snap = await getDoc(doc(db,"admins",uid));
+    return snap.exists();
+  }
 
-  const base = location.origin + location.pathname.replace("admin.html","");
+  function setLoginError(e){
+    loginMsg.className = "msg bad";
+    loginMsg.textContent = "Erreur: " + (e?.code ?? "") + " " + (e?.message ?? e);
+  }
 
-  snap.forEach(docu=>{
-    const d=docu.data();
-    const total = d.totalCheckins||0;
-    const rewards = Math.floor(total/20);
+  // Login
+  document.getElementById("btnLogin").onclick = async ()=>{
+    loginMsg.className = "msg";
+    loginMsg.textContent = "";
 
-    // Carte étudiant (à présenter)
-    const cardLink = `${base}student.html?sid=${docu.id}`;
-    const cardQR = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data="+encodeURIComponent(`SID:${docu.id}`);
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const btn = document.getElementById("btnLogin");
 
-    tbody.innerHTML+=`
-      <tr>
-        <td>${d.lastName} ${d.firstName}</td>
-        <td>${total}</td>
-        <td>${rewards}</td>
-        <td>
-          <img src="${cardQR}" style="border-radius:12px;border:1px solid #ddd"><br>
-          <a href="${cardLink}" target="_blank">Carte étudiant</a>
-        </td>
-      </tr>
-    `;
+    btn.disabled = true;
+    btn.textContent = "Connexion…";
+    try{
+      await signInWithEmailAndPassword(auth, email, password);
+    }catch(e){
+      setLoginError(e);
+    }finally{
+      btn.disabled = false;
+      btn.textContent = "Se connecter";
+    }
+  };
+
+  async function doLogout(){
+    await signOut(auth);
+  }
+  btnLogout.onclick = doLogout;
+  btnLogout2.onclick = doLogout;
+
+  // Create student (manual / legacy)
+  document.getElementById("btnCreate").onclick = async ()=>{
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName  = document.getElementById("lastName").value.trim();
+    if(!firstName || !lastName) return alert("Nom et prénom obligatoires.");
+
+    const btn = document.getElementById("btnCreate");
+    btn.disabled = true;
+    btn.textContent = "Création…";
+
+    try{
+      await addDoc(collection(db,"students"),{
+        firstName, lastName,
+        totalCheckins: 0,
+        lastCheckinDate: null,
+        createdAt: serverTimestamp()
+      });
+      document.getElementById("firstName").value = "";
+      document.getElementById("lastName").value = "";
+      await loadStudents();
+    }finally{
+      btn.disabled = false;
+      btn.textContent = "Créer";
+    }
+  };
+
+  document.getElementById("btnRefresh").onclick = loadStudents;
+
+  // Load students (table + mobile cards)
+  async function loadStudents(){
+    const tbody = document.getElementById("students");
+    const cards = document.getElementById("cards");
+    tbody.innerHTML = "";
+    cards.innerHTML = "";
+
+    const snap = await getDocs(collection(db,"students"));
+    const base = location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
+
+    snap.forEach(docu=>{
+      const d = docu.data();
+      const total = d.totalCheckins || 0;
+      const rewards = Math.floor(total/20);
+
+      const cardLink = `${base}student.html?sid=${encodeURIComponent(docu.id)}`;
+      const qrPayload = `SID:${docu.id}`;
+      const qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`;
+
+      // Desktop row
+      tbody.innerHTML += `
+        <tr>
+          <td class="name">${(d.lastName ?? "")} ${(d.firstName ?? "")}</td>
+          <td class="num">${total}</td>
+          <td class="num">${rewards}</td>
+          <td>
+            <img class="qrImg" src="${qr}" alt="QR">
+            <div class="miniLink"><a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a></div>
+          </td>
+        </tr>
+      `;
+
+      // Mobile card
+      cards.innerHTML += `
+        <div class="sCard">
+          <div class="sTop">
+            <div>
+              <div class="sName">${(d.lastName ?? "")} ${(d.firstName ?? "")}</div>
+              <div class="sMeta">Présences: <span class="num">${total}</span> • Récompenses: <span class="num">${rewards}</span></div>
+            </div>
+            <img class="qrImg" src="${qr}" alt="QR">
+          </div>
+          <div class="sActions">
+            <a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // Auth state
+  onAuthStateChanged(auth, async (user)=>{
+    if(!user){
+      setPill("", "Non connecté");
+      goScan.style.display = "none";
+      btnLogout.style.display = "none";
+      bottomBar.style.display = "none";
+
+      loginBox.style.display = "block";
+      adminBox.style.display = "none";
+      listBox.style.display  = "none";
+
+      adminStatus.textContent = "";
+      document.getElementById("email").focus();
+      return;
+    }
+
+    setPill("", user.email ?? user.uid);
+
+    const ok = await isAdmin(user.uid);
+    if(!ok){
+      setPill("bad", "Non autorisé");
+      goScan.style.display = "none";
+      btnLogout.style.display = "inline-flex";
+      bottomBar.style.display = "block";
+
+      loginBox.style.display = "block";
+      adminBox.style.display = "none";
+      listBox.style.display  = "none";
+
+      adminStatus.className = "msg bad";
+      adminStatus.textContent = "Compte connecté mais pas admin (UID absent dans /admins).";
+      return;
+    }
+
+    setPill("ok", `Admin: ${user.email ?? user.uid}`);
+    goScan.style.display = "inline-flex";
+    btnLogout.style.display = "inline-flex";
+    bottomBar.style.display = "block";
+
+    loginBox.style.display = "none";
+    adminBox.style.display = "block";
+    listBox.style.display  = "block";
+
+    adminStatus.className = "msg ok";
+    adminStatus.textContent = "Connecté ✅";
+    await loadStudents();
   });
-}
-  </script>
+</script>
+
 </body>
 </html>
-
-  
