@@ -30,6 +30,12 @@
 
     *{box-sizing:border-box}
     html{-webkit-text-size-adjust:100%}
+    
+    <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+</script>
 
     body{
       margin:0;
