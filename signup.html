@@ -4,223 +4,36 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CTeen — Inscription</title>
+
+  <!-- CSS centralisé -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <style>
-    :root{
-      --bg:#0b1220;
-      --card:#0f1b33;
-      --line:rgba(255,255,255,.10);
-      --text:#eaf0ff;
-      --muted:rgba(234,240,255,.72);
-      --blue:#2f6bff;
-      --orange:#ff8a1f;
-      --ok:#22c55e;
-      --bad:#ef4444;
-      --warn:#f59e0b;
-      --shadow: 0 16px 50px rgba(0,0,0,.35);
-      --r:18px;
-      --tap:48px;
-      --max:560px;
-    }
-
-    *{box-sizing:border-box}
-    html{-webkit-text-size-adjust:100%}
-    
-    <script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
-</script>
-
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
-        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
-        var(--bg);
-    }
-
-    .wrap{
-      min-height: 100dvh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:
-        calc(18px + env(safe-area-inset-top))
-        calc(16px + env(safe-area-inset-right))
-        calc(24px + env(safe-area-inset-bottom))
-        calc(16px + env(safe-area-inset-left));
-    }
-
-    .card{
-      width: min(100%, var(--max));
-      border:1px solid var(--line);
-      background: rgba(15,27,51,.82);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      padding: 16px;
-      backdrop-filter: blur(10px);
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom: 6px;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.16);
-      font-weight:900;
-      letter-spacing:.2px;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background:linear-gradient(135deg,var(--blue),var(--orange));
-    }
-
-    h1{margin:8px 0 6px; font-size:18px}
-    p{margin:0; color:var(--muted); line-height:1.35}
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top: 8px;
-    }
-    @media(max-width:560px){ .grid{grid-template-columns:1fr} }
-
-    .field{
-      width:100%;
-      height: var(--tap);
-      margin-top:10px;
-      padding: 0 14px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.35);
-      color:var(--text);
-      outline:none;
-    }
-    .field::placeholder{color:rgba(234,240,255,.55)}
-    .field:focus{
-      border-color: rgba(47,107,255,.45);
-      box-shadow: 0 0 0 3px rgba(47,107,255,.20);
-    }
-
-    .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .toggle{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:var(--muted);
-      font-size:13px;
-      user-select:none;
-    }
-    .toggle input{transform: scale(1.05)}
-
-    .btn{
-      width:100%;
-      height: var(--tap);
-      margin-top:12px;
-      border-radius: 14px;
-      border:1px solid var(--line);
-      background: rgba(255,138,31,.22);
-      color: var(--text);
-      font-weight: 900;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      user-select:none;
-    }
-    .btn:active{transform: translateY(1px)}
-    .btn:disabled{opacity:.65; cursor:not-allowed}
-
-    .msg{
-      margin-top:10px;
-      font-size:13px;
-      line-height:1.35;
-    }
-    .msg.bad{color:var(--bad)}
-    .msg.ok{color:var(--ok)}
-    .msg.warn{color:var(--warn)}
-    .msg.muted{color:var(--muted)}
-
-    .helper{
-      margin-top:10px;
-      padding:12px;
-      border-radius: 16px;
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.30);
-      color: var(--muted);
-      font-size: 13px;
-      line-height:1.35;
-    }
-
-    .links{
-      margin-top:12px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:13px;
-    }
-    a{color:#b9ccff; text-decoration:none; font-weight:900}
-    a:hover{text-decoration:underline}
-
-    .divider{
-      margin-top:12px;
-      height:1px;
-      background: var(--line);
-    }
-  </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="brand">
-        <div class="badge"><span class="dot"></span> CTeen</div>
-        <div style="color:var(--muted);font-size:12px;font-weight:800;">Inscription</div>
+  <div class="center">
+    <div class="card card-md">
+      <div class="brandRow">
+        <div class="badge"><span class="brandDot"></span> CTeen</div>
+        <div class="muted tiny strong">Inscription</div>
       </div>
 
-      <h1>Créer ton compte étudiant</h1>
-      <p>Tu obtiens ton QR + ton suivi de présences.</p>
+      <h1 class="h1">Créer ton compte étudiant</h1>
+      <p class="muted">Tu obtiens ton QR + ton suivi de présences.</p>
 
       <form id="form">
-        <div class="grid">
-          <div>
-            <input id="firstName" class="field" placeholder="Prénom"
-                   autocomplete="given-name" enterkeyhint="next" required>
-          </div>
-          <div>
-            <input id="lastName" class="field" placeholder="Nom"
-                   autocomplete="family-name" enterkeyhint="next" required>
-          </div>
+        <div class="grid2">
+          <input id="firstName" class="field" placeholder="Prénom"
+                 autocomplete="given-name" enterkeyhint="next" required>
+
+          <input id="lastName" class="field" placeholder="Nom"
+                 autocomplete="family-name" enterkeyhint="next" required>
         </div>
 
         <input id="email" class="field" type="email" placeholder="Email"
@@ -232,30 +45,37 @@
         <input id="password2" class="field" type="password" placeholder="Confirmer le mot de passe"
                autocomplete="new-password" enterkeyhint="go" required>
 
-        <div class="row">
+        <div class="rowBetween">
           <label class="toggle">
             <input id="showPass" type="checkbox">
             Afficher les mots de passe
           </label>
-          <span class="msg muted" id="caps" style="display:none;">⚠️ Majuscule activée</span>
+          <span class="muted tiny" id="caps" style="display:none;">⚠️ Majuscule activée</span>
         </div>
 
         <div class="helper" id="pwdHint">
           Conseil : utilise au moins 6 caractères. Mélanger lettres et chiffres est mieux.
         </div>
 
-        <button id="btnSignup" class="btn" type="submit">Créer mon compte</button>
+        <button id="btnSignup" class="btn orange w100" type="submit">Créer mon compte</button>
         <p class="msg" id="msg"></p>
       </form>
 
       <div class="divider"></div>
 
       <div class="links">
-        <span>Déjà inscrit ? <a href="./login.html">Se connecter</a></span>
-        <a href="./admin.html" style="opacity:.85;">Espace admin</a>
+        <span class="muted tiny">Déjà inscrit ? <a href="./login.html">Se connecter</a></span>
+        <a class="muted tiny" href="./admin.html" style="opacity:.85;">Espace admin</a>
       </div>
     </div>
   </div>
+
+  <!-- Service worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    }
+  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -292,17 +112,14 @@
       msg.textContent = text;
     }
 
-    // focus
     firstNameEl.focus();
 
-    // show password
     showPass.addEventListener("change", (e)=>{
       const t = e.target.checked ? "text" : "password";
       passEl.type = t;
       pass2El.type = t;
     });
 
-    // caps lock warning
     function capsCheck(e){
       if(e.getModifierState && e.getModifierState("CapsLock")){
         caps.style.display = "inline";
@@ -313,7 +130,6 @@
     passEl.addEventListener("keyup", capsCheck);
     pass2El.addEventListener("keyup", capsCheck);
 
-    // live password quality hint (simple)
     passEl.addEventListener("input", ()=>{
       const v = passEl.value || "";
       const okLen = v.length >= 6;
@@ -322,16 +138,16 @@
 
       if(!v){
         pwdHint.textContent = "Conseil : utilise au moins 6 caractères. Mélanger lettres et chiffres est mieux.";
-        pwdHint.style.borderColor = "var(--line)";
+        pwdHint.dataset.state = "";
         return;
       }
 
       if(okLen && hasNum && hasLetter){
         pwdHint.textContent = "Mot de passe OK ✅";
-        pwdHint.style.borderColor = "rgba(34,197,94,.35)";
+        pwdHint.dataset.state = "ok";
       }else{
         pwdHint.textContent = "Mot de passe un peu faible : vise 6+ caractères + lettres et chiffres.";
-        pwdHint.style.borderColor = "rgba(245,158,11,.35)";
+        pwdHint.dataset.state = "warn";
       }
     });
 
@@ -356,7 +172,6 @@
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         const uid = cred.user.uid;
 
-        // doc étudiant = uid
         await setDoc(doc(db, "students", uid), {
           firstName, lastName,
           email,
