@@ -5,299 +5,27 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CTeen — Mon espace</title>
 
+  <!-- CSS centralisé -->
+  <link rel="stylesheet" href="./css/style.css">
+
   <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-
-  <style>
-    :root{
-      --bg:#0b1220;
-      --card:rgba(15,27,51,.86);
-      --line:rgba(255,255,255,.10);
-      --text:#eaf0ff;
-      --muted:rgba(234,240,255,.72);
-      --blue:#2f6bff;
-      --orange:#ff8a1f;
-      --ok:#22c55e;
-      --bad:#ef4444;
-      --shadow: 0 16px 50px rgba(0,0,0,.35);
-      --r:18px;
-      --tap:48px;
-      --max:560px;
-    }
-    *{box-sizing:border-box}
-    html{-webkit-text-size-adjust:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.20), transparent 60%),
-        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.16), transparent 60%),
-        var(--bg);
-    }
-
-    .wrap{
-      max-width: var(--max);
-      margin: 0 auto;
-      padding:
-        calc(14px + env(safe-area-inset-top))
-        calc(14px + env(safe-area-inset-right))
-        calc(26px + env(safe-area-inset-bottom))
-        calc(14px + env(safe-area-inset-left));
-    }
-
-    .top{
-      border:1px solid var(--line);
-      background: var(--card);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      padding: 14px;
-    }
-
-    .badge{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:10px 12px; border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.16);
-      font-weight:900;
-      letter-spacing:.2px;
-    }
-    .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,var(--blue),var(--orange))}
-
-    .headRow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-top:10px}
-    .idBlock{min-width:0}
-    .email{color:var(--muted);font-size:13px;word-break:break-word}
-    h1{margin:6px 0 0;font-size:20px;line-height:1.1}
-    .sub{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.35}
-
-    .btn{
-      height: var(--tap);
-      padding:0 14px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background: rgba(47,107,255,.22);
-      color:var(--text);
-      font-weight:900;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      text-decoration:none;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .btn.orange{background: rgba(255,138,31,.22)}
-    .btn.ghost{background: rgba(0,0,0,.14)}
-    .btn:active{transform:translateY(1px)}
-
-    .banner{
-      display:none;
-      margin-top:12px;
-      border:1px solid rgba(34,197,94,.25);
-      background: rgba(34,197,94,.10);
-      border-radius: 16px;
-      padding: 12px;
-      font-weight: 900;
-    }
-
-    /* KPI — compact */
-    .kpis{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:10px;
-      margin-top:12px;
-    }
-    .kpi{
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.34);
-      border-radius: 16px;
-      padding: 12px;
-    }
-    .kpi .label{font-size:11px;color:rgba(234,240,255,.62);letter-spacing:.3px;text-transform:uppercase}
-    .kpi .val{margin-top:6px;font-size:18px;font-weight:900;font-variant-numeric:tabular-nums}
-
-    /* Progress */
-    .progress{
-      margin-top:10px;
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.34);
-      border-radius: 16px;
-      padding: 12px;
-    }
-    .barOuter{
-      margin-top:10px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      overflow:hidden;
-      height:14px;
-      background: rgba(0,0,0,.18);
-    }
-    .barInner{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, var(--blue), var(--orange));
-      transition: width .35s ease;
-    }
-    .barText{margin-top:8px;color:var(--muted);font-size:13px}
-
-    /* Main cards */
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-      margin-top:12px;
-    }
-
-    .card{
-      border:1px solid var(--line);
-      background: var(--card);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      padding: 14px;
-    }
-
-    .cardTitle{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin:0;
-      font-size:14px;
-      letter-spacing:.2px;
-    }
-    .muted{color:var(--muted);font-size:13px;line-height:1.35;margin-top:8px}
-
-    /* QR presentation */
-    .qrShell{
-      margin-top:12px;
-      display:flex;
-      justify-content:center;
-    }
-    .qrFrame{
-      width: min(320px, 84vw);
-      background: #fff;
-      border-radius: 22px;
-      padding: 12px;              /* ✅ marge blanche autour du QR */
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
-      border: 1px solid rgba(0,0,0,.06);
-    }
-    .qr{
-      width: 100%;
-      aspect-ratio: 1/1;
-      display:block;
-      border-radius: 14px;
-      background:#fff;
-    }
-
-    /* Last scan */
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(0,0,0,.16);
-      font-weight: 900;
-      font-size: 13px;
-    }
-    .pulse{
-      width:10px;height:10px;border-radius:999px;background:rgba(34,197,94,.95);
-      box-shadow:0 0 0 0 rgba(34,197,94,.45);
-      animation:pulse 1.6s infinite;
-      display:none;
-    }
-    @keyframes pulse{
-      0%{box-shadow:0 0 0 0 rgba(34,197,94,.45)}
-      70%{box-shadow:0 0 0 14px rgba(34,197,94,0)}
-      100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}
-    }
-
-    /* Bottom sticky actions (mobile) */
-    .bottom{
-      position: fixed;
-      left:0; right:0; bottom:0;
-      padding:
-        10px
-        calc(10px + env(safe-area-inset-right))
-        calc(10px + env(safe-area-inset-bottom))
-        calc(10px + env(safe-area-inset-left));
-      background: linear-gradient(180deg, transparent, rgba(11,18,32,.90));
-      z-index: 20;
-    }
-    .bottom .inner{
-      max-width: var(--max);
-      margin:0 auto;
-      display:flex;
-      gap:10px;
-    }
-    .bottom .inner .btn{flex:1}
-    .spacer{height: 90px;} /* to avoid overlap on mobile */
-
-    /* Fullscreen QR */
-    .overlay{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.92);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:
-        calc(14px + env(safe-area-inset-top))
-        calc(14px + env(safe-area-inset-right))
-        calc(14px + env(safe-area-inset-bottom))
-        calc(14px + env(safe-area-inset-left));
-      z-index: 50;
-    }
-    .overlayInner{
-      width:min(560px, 92vw);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:12px;
-    }
-    .qrBigFrame{
-      width:min(520px, 92vw);
-      background:#fff;
-      border-radius: 28px;
-      padding: 14px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-    }
-    .qrBig{
-      width:100%;
-      aspect-ratio:1/1;
-      border-radius: 16px;
-      display:block;
-      background:#fff;
-    }
-    .overlayName{
-      text-align:center;
-      font-weight:900;
-      color: rgba(234,240,255,.92);
-    }
-    .overlaySub{
-      text-align:center;
-      color: rgba(234,240,255,.65);
-      font-size:13px;
-      line-height:1.35;
-    }
-  </style>
 </head>
 
 <body>
-  <div class="wrap">
+  <div class="wrap wrap-me">
 
-    <div class="top">
-      <div class="badge"><span class="dot"></span> CTeen — Mon espace</div>
+    <section class="card topCard">
+      <div class="badge"><span class="brandDot"></span> CTeen — Mon espace</div>
 
       <div class="headRow">
         <div class="idBlock">
           <div class="email" id="email">—</div>
-          <h1 id="name">Chargement…</h1>
+          <h1 class="h1Me" id="name">Chargement…</h1>
           <div class="sub">Ton QR + ton suivi de présences.</div>
         </div>
 
@@ -322,13 +50,13 @@
       </div>
 
       <div class="progress">
-        <div class="label" style="font-size:11px;color:rgba(234,240,255,.62);letter-spacing:.3px;text-transform:uppercase">Progression</div>
+        <div class="label labelUp">Progression</div>
         <div class="barOuter"><div class="barInner" id="bar"></div></div>
         <div class="barText" id="barText">—</div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid">
+    <section class="grid1">
       <div class="card">
         <div class="cardTitle">
           <span>Mon QR à présenter</span>
@@ -341,24 +69,31 @@
           </div>
         </div>
 
-        <div class="muted">Astuce : mets le QR en plein écran avant de le montrer à l’admin.</div>
+        <div class="muted mt10">
+          Astuce : mets le QR en plein écran avant de le montrer à l’admin.
+        </div>
       </div>
 
       <div class="card">
         <div class="cardTitle">
           <span>Dernière validation</span>
-          <span class="pill"><span class="pulse" id="pulse"></span><span id="lastText">—</span></span>
+          <span class="pill">
+            <span class="pulse" id="pulse"></span>
+            <span id="lastText">—</span>
+          </span>
         </div>
-        <div class="muted">Quand l’admin te scanne, ça se met à jour ici (max 1 fois par jour).</div>
+        <div class="muted mt10">
+          Quand l’admin te scanne, ça se met à jour ici (max 1 fois par jour).
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="spacer"></div>
+    <div class="spacerMe"></div>
   </div>
 
   <!-- Bottom bar mobile -->
-  <div class="bottom">
-    <div class="inner">
+  <div class="bottomMe">
+    <div class="innerMe">
       <button class="btn ghost" id="btnFull2">🔳 Plein écran</button>
       <button class="btn orange" id="btnLogout2">Déconnexion</button>
     </div>
@@ -375,6 +110,13 @@
       <button class="btn orange" id="btnClose">Fermer</button>
     </div>
   </div>
+
+  <!-- Service worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    }
+  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -394,11 +136,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // PWA SW
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").catch(()=>{});
-    }
-
     const nameEl = document.getElementById("name");
     const emailEl = document.getElementById("email");
     const totalEl = document.getElementById("total");
@@ -417,10 +154,7 @@
       const payload = `SID:${uid}`;
       const url1 = "https://api.qrserver.com/v1/create-qr-code/?size=900x900&data=" + encodeURIComponent(payload);
       const url2 = "https://quickchart.io/qr?size=900&text=" + encodeURIComponent(payload);
-
-      qrImg.src = url1;
-      qrBig.src = url1;
-
+      qrImg.src = url1; qrBig.src = url1;
       qrImg.onerror = ()=> { qrImg.src = url2; };
       qrBig.onerror = ()=> { qrBig.src = url2; };
     }
@@ -452,7 +186,6 @@
       emailEl.textContent = user.email ?? "";
       setQr(user.uid);
 
-      // students/{uid}
       onSnapshot(doc(db,"students",user.uid), (snap)=>{
         if(!snap.exists()) return;
         const d = snap.data();
@@ -465,11 +198,9 @@
         rewardsEl.textContent = String(Math.floor(total/20));
         setProgress(total);
 
-        // dernière validation (date)
         lastText.textContent = d.lastCheckinDate ?? "—";
       });
 
-      // publicStatus/{uid} => message “scanné bon cours”
       onSnapshot(doc(db,"publicStatus",user.uid), (snap)=>{
         if(!snap.exists()) return;
         const d = snap.data();
