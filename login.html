@@ -4,36 +4,232 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CTeen — Connexion</title>
+
   <style>
-    :root{--bg:#0b1220;--card:#0f1b33;--line:rgba(255,255,255,.10);--text:#eaf0ff;--muted:rgba(234,240,255,.72);--blue:#2f6bff;--orange:#ff8a1f;--ok:#22c55e;--bad:#ef4444;--r:18px}
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--text);
-      background:radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
-                 radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%), var(--bg);}
-    .wrap{max-width:520px;margin:0 auto;padding:22px 16px 40px}
-    .card{border:1px solid var(--line);background:rgba(15,27,51,.78);border-radius:var(--r);padding:16px}
-    h1{margin:0 0 6px;font-size:18px} p{margin:0;color:var(--muted)}
-    .field{width:100%;margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(11,18,32,.35);color:var(--text);outline:none}
-    .btn{width:100%;margin-top:12px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(47,107,255,.22);color:var(--text);font-weight:900;cursor:pointer}
-    .btn.orange{background:rgba(255,138,31,.20)}
-    .msg{margin-top:10px} .bad{color:var(--bad)}
-    a{color:#b9ccff;text-decoration:none}
+    :root{
+      --bg:#0b1220;
+      --card:#0f1b33;
+      --line:rgba(255,255,255,.10);
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.72);
+      --blue:#2f6bff;
+      --orange:#ff8a1f;
+      --ok:#22c55e;
+      --bad:#ef4444;
+      --shadow: 0 16px 50px rgba(0,0,0,.35);
+      --r:18px;
+      --tap:48px;
+      --max:520px;
+    }
+
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
+        var(--bg);
+    }
+
+    .wrap{
+      min-height: 100dvh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:
+        calc(18px + env(safe-area-inset-top))
+        calc(16px + env(safe-area-inset-right))
+        calc(24px + env(safe-area-inset-bottom))
+        calc(16px + env(safe-area-inset-left));
+    }
+
+    .card{
+      width: min(100%, var(--max));
+      border:1px solid var(--line);
+      background: rgba(15,27,51,.82);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 6px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.16);
+      font-weight:900;
+      letter-spacing:.2px;
+      color: var(--text);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background:linear-gradient(135deg,var(--blue),var(--orange));
+    }
+
+    h1{margin:8px 0 6px; font-size:18px}
+    p{margin:0; color:var(--muted); line-height:1.35}
+
+    .field{
+      width:100%;
+      height: var(--tap);
+      margin-top:10px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(11,18,32,.35);
+      color:var(--text);
+      outline:none;
+    }
+    .field::placeholder{color:rgba(234,240,255,.55)}
+    .field:focus{
+      border-color: rgba(47,107,255,.45);
+      box-shadow: 0 0 0 3px rgba(47,107,255,.20);
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      font-size:13px;
+      user-select:none;
+    }
+    .toggle input{transform: scale(1.05)}
+
+    .btn{
+      width:100%;
+      height: var(--tap);
+      margin-top:12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(255,138,31,.22);
+      color: var(--text);
+      font-weight: 900;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn:disabled{opacity:.65; cursor:not-allowed}
+
+    .msg{
+      margin-top:10px;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .msg.bad{color:var(--bad)}
+    .msg.ok{color:var(--ok)}
+    .msg.muted{color:var(--muted)}
+
+    .links{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:13px;
+    }
+    a{color:#b9ccff; text-decoration:none; font-weight:900}
+    a:hover{text-decoration:underline}
+
+    .divider{
+      margin-top:12px;
+      height:1px;
+      background: var(--line);
+    }
+
+    .smallTip{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Connexion</h1>
-      <p>Accède à ton QR et ton suivi.</p>
+      <div class="brand">
+        <div class="badge"><span class="dot"></span> CTeen</div>
+        <div style="color:var(--muted);font-size:12px;font-weight:800;">Connexion</div>
+      </div>
 
-      <input id="email" class="field" type="email" placeholder="Email" />
-      <input id="password" class="field" type="password" placeholder="Mot de passe" />
+      <h1>Accède à ton QR et ton suivi</h1>
+      <p>Connecte-toi pour voir ton nom, ton QR, et tes présences.</p>
 
-      <button id="btnLogin" class="btn orange">Se connecter</button>
-      <p class="msg" id="msg"></p>
+      <form id="form">
+        <input
+          id="email"
+          class="field"
+          type="email"
+          placeholder="Email"
+          autocomplete="email"
+          inputmode="email"
+          enterkeyhint="next"
+          required
+        />
 
-      <p style="margin-top:12px;color:var(--muted)">
-        Pas encore de compte ? <a href="./signup.html">Créer mon compte</a>
-      </p>
+        <input
+          id="password"
+          class="field"
+          type="password"
+          placeholder="Mot de passe"
+          autocomplete="current-password"
+          enterkeyhint="go"
+          required
+        />
+
+        <div class="row">
+          <label class="toggle">
+            <input id="showPass" type="checkbox" />
+            Afficher le mot de passe
+          </label>
+          <span class="msg muted" id="caps" style="display:none;">⚠️ Majuscule activée</span>
+        </div>
+
+        <button id="btnLogin" class="btn" type="submit">Se connecter</button>
+        <p class="msg" id="msg"></p>
+      </form>
+
+      <div class="divider"></div>
+
+      <div class="links">
+        <span>Pas de compte ? <a href="./signup.html">Créer mon compte</a></span>
+        <a href="./admin.html" style="opacity:.85;">Espace admin</a>
+      </div>
+
+      <div class="smallTip">
+        Astuce : si tu es sur iPhone, garde cette page en favori sur l’écran d’accueil.
+      </div>
     </div>
   </div>
 
@@ -53,23 +249,62 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    const form = document.getElementById("form");
+    const emailEl = document.getElementById("email");
+    const passEl = document.getElementById("password");
+    const showPass = document.getElementById("showPass");
     const msg = document.getElementById("msg");
-    function setMsg(t){ msg.className="msg bad"; msg.textContent=t; }
+    const btnLogin = document.getElementById("btnLogin");
+    const caps = document.getElementById("caps");
 
-    onAuthStateChanged(auth, (u)=>{ if(u) location.href="./me.html"; });
+    function setMsg(text, kind=""){
+      msg.className = "msg " + kind;
+      msg.textContent = text;
+    }
 
-    document.getElementById("btnLogin").onclick = async ()=>{
-      msg.textContent="";
-      try{
-        await signInWithEmailAndPassword(auth,
-          document.getElementById("email").value.trim(),
-          document.getElementById("password").value
-        );
-        location.href="./me.html";
-      }catch(e){
-        setMsg("Erreur: " + (e?.code ?? "") + " " + (e?.message ?? e));
+    // auto redirect if already logged in
+    onAuthStateChanged(auth, (u)=>{
+      if(u) location.href="./me.html";
+    });
+
+    // UX: focus email
+    emailEl.focus();
+
+    // show password
+    showPass.addEventListener("change", (e)=>{
+      passEl.type = e.target.checked ? "text" : "password";
+    });
+
+    // Caps lock warning
+    passEl.addEventListener("keyup", (e)=>{
+      if(e.getModifierState && e.getModifierState("CapsLock")){
+        caps.style.display = "inline";
+      }else{
+        caps.style.display = "none";
       }
-    };
+    });
+
+    form.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      setMsg("");
+
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+
+      btnLogin.disabled = true;
+      btnLogin.textContent = "Connexion…";
+
+      try{
+        await signInWithEmailAndPassword(auth, email, password);
+        setMsg("Connecté ✅", "ok");
+        location.href="./me.html";
+      }catch(err){
+        setMsg("Erreur: " + (err?.code ?? "") + " " + (err?.message ?? err), "bad");
+      }finally{
+        btnLogin.disabled = false;
+        btnLogin.textContent = "Se connecter";
+      }
+    });
   </script>
 </body>
 </html>
