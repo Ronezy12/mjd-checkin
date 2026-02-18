@@ -109,37 +109,57 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ============================
+/* ======================
    UI
-============================ */
+====================== */
 
 const loginBox = document.getElementById("loginBox");
 const listBox = document.getElementById("listBox");
+
 const pillText = document.getElementById("pillText");
 const dot = document.getElementById("dot");
+
+const btnLogin = document.getElementById("btnLogin");
+const btnLogout = document.getElementById("btnLogout");
+const goScan = document.getElementById("goScan");
+
+const loginMsg = document.getElementById("loginMsg");
+
+/* ======================
+   SHOW PASSWORD
+====================== */
 
 document.getElementById("showPass").addEventListener("change", e=>{
   document.getElementById("password").type = e.target.checked ? "text" : "password";
 });
 
-/* ============================
+/* ======================
    LOGIN
-============================ */
+====================== */
 
-document.getElementById("btnLogin").onclick = async ()=>{
-  const email = email.value.trim();
-  const password = document.getElementById("password").value;
+btnLogin.onclick = async ()=>{
+  loginMsg.textContent = "";
   try{
-    await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("email").value.trim(),
+      document.getElementById("password").value
+    );
   }catch(e){
     loginMsg.textContent = e.message;
     loginMsg.className = "msg bad";
   }
 };
 
-/* ============================
+/* ======================
+   LOGOUT
+====================== */
+
+btnLogout.onclick = ()=> signOut(auth);
+
+/* ======================
    INVITE LINK
-============================ */
+====================== */
 
 document.getElementById("btnInvite").onclick = async ()=>{
   const link = location.origin + location.pathname.replace(/\/admin\.html$/, "/");
@@ -159,9 +179,9 @@ document.getElementById("btnInvite").onclick = async ()=>{
   alert("Lien copié ✅\n\n" + link);
 };
 
-/* ============================
+/* ======================
    LOAD STUDENTS
-============================ */
+====================== */
 
 async function loadStudents(){
   const tbody = document.getElementById("students");
@@ -187,34 +207,44 @@ async function loadStudents(){
 
 document.getElementById("btnRefresh").onclick = loadStudents;
 
-/* ============================
+/* ======================
    AUTH STATE
-============================ */
+====================== */
 
 onAuthStateChanged(auth, async (user)=>{
+
   if(!user){
     pillText.textContent = "Non connecté";
     dot.classList.remove("ok");
+
     loginBox.style.display = "block";
     listBox.style.display = "none";
+
+    goScan.style.display = "none";
+    btnLogout.style.display = "none";
     return;
   }
 
   const snap = await getDoc(doc(db,"admins",user.uid));
+
   if(!snap.exists()){
     pillText.textContent = "Non autorisé";
     dot.classList.remove("ok");
     return;
   }
 
+  // ✅ ADMIN CONNECTÉ
   pillText.textContent = "Admin: " + user.email;
   dot.classList.add("ok");
+
   loginBox.style.display = "none";
   listBox.style.display = "block";
+
+  goScan.style.display = "inline-flex";
+  btnLogout.style.display = "inline-flex";
+
   await loadStudents();
 });
-
-document.getElementById("btnLogout").onclick = ()=> signOut(auth);
 
 </script>
 
