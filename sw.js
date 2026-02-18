@@ -1,68 +1,58 @@
-const CACHE_NAME = "cteen-checkin-v2";
-
+const CACHE_NAME = "cteen-checkin-v3"; // ✅ change la version à chaque update
 const ASSETS = [
-  "./",
-  "./index.html",
-  "./login.html",
-  "./signup.html",
-  "./me.html",
-  "./admin.html",
-  "./scan.html",
-  "./student.html",
-  "./manifest.webmanifest",
-  "./css/style.css",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "/mjd-checkin/",
+  "/mjd-checkin/login.html",
+  "/mjd-checkin/signup.html",
+  "/mjd-checkin/me.html",
+  "/mjd-checkin/admin.html",
+  "/mjd-checkin/scan.html",
+  "/mjd-checkin/student.html",
+  "/mjd-checkin/manifest.webmanifest",
+  "/mjd-checkin/css/style.css",
+  "/mjd-checkin/icons/icon-192.png",
+  "/mjd-checkin/icons/icon-512.png"
 ];
 
-// INSTALL
 self.addEventListener("install", (event) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
 });
 
-// ACTIVATE
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(k => k !== CACHE_NAME)
-          .map(k => caches.delete(k))
-      )
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
-// FETCH
 self.addEventListener("fetch", (event) => {
   const req = event.request;
+  const url = new URL(req.url);
 
-  // On ignore Firebase & CDN
-  if (
-    req.url.includes("firebase") ||
-    req.url.includes("gstatic") ||
-    req.url.includes("unpkg") ||
-    req.url.includes("api.qrserver") ||
-    req.url.includes("quickchart")
-  ) {
+  // ✅ Network-first pour les navigations (pages HTML)
+  if (req.mode === "navigate") {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req);
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, fresh.clone());
+        return fresh;
+      } catch (e) {
+        const cached = await caches.match(req);
+        return cached || caches.match("/mjd-checkin/login.html");
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    caches.match(req).then(cached => {
-      if (cached) return cached;
-
-      return fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
-        return res;
-      }).catch(() => {
-        return caches.match("./login.html");
-      });
-    })
-  );
+  // ✅ Cache-first pour les assets
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    if (cached) return cached;
+    const res = await fetch(req);
+    const cache = await caches.open(CACHE_NAME);
+    cache.put(req, res.clone());
+    return res;
+  })());
 });
