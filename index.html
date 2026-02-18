@@ -3,10 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CTeen Yerres — Suivi des cours de Tania</title>
 
+  <title>CTeen Yerres — Suivi des cours de Tania</title>
+  <meta name="description" content="CTeen Yerres : QR code personnel, check-in instantané, suivi des présences et récompenses (1 toutes les 20 présences)." />
+
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
+
+  <!-- iOS PWA -->
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="./css/style.css">
 </head>
 
@@ -16,12 +26,12 @@
     <div class="hero-inner">
 
       <div class="badge">
-        <span class="dot"></span> CTeen
+        <span class="brandDot"></span> CTeen
       </div>
 
       <h1>
         Le check-in intelligent<br>
-        pour la Maison des Jeunes Cteen de Yerres
+        pour la Maison des Jeunes CTeen de Yerres
       </h1>
 
       <p class="lead">
@@ -37,6 +47,10 @@
       <div class="sub">
         Espace Admin ?
         <a href="./admin.html">Accès admin</a>
+      </div>
+
+      <div class="sub" style="opacity:.9; margin-top:10px;">
+        Astuce : sur iPhone/Android, ajoute CTeen à l’écran d’accueil pour l’utiliser comme une vraie app.
       </div>
 
     </div>
@@ -60,6 +74,13 @@
     </div>
 
   </section>
+
+  <!-- Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    }
+  </script>
 
 </body>
 </html>
