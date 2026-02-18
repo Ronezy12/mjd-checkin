@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CTeen — Inscription</title>
+  <style>
+    :root{--bg:#0b1220;--card:#0f1b33;--line:rgba(255,255,255,.10);--text:#eaf0ff;--muted:rgba(234,240,255,.72);--blue:#2f6bff;--orange:#ff8a1f;--ok:#22c55e;--bad:#ef4444;--r:18px}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--text);
+      background:radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
+                 radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%), var(--bg);}
+    .wrap{max-width:520px;margin:0 auto;padding:22px 16px 40px}
+    .card{border:1px solid var(--line);background:rgba(15,27,51,.78);border-radius:var(--r);padding:16px}
+    h1{margin:0 0 6px;font-size:18px} p{margin:0;color:var(--muted)}
+    .field{width:100%;margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(11,18,32,.35);color:var(--text);outline:none}
+    .btn{width:100%;margin-top:12px;padding:12px;border-radius:14px;border:1px solid var(--line);background:rgba(47,107,255,.22);color:var(--text);font-weight:900;cursor:pointer}
+    .btn.orange{background:rgba(255,138,31,.20)}
+    .msg{margin-top:10px} .ok{color:var(--ok)} .bad{color:var(--bad)}
+    a{color:#b9ccff;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Inscription étudiant</h1>
+      <p>Crée ton compte pour obtenir ton QR et ton suivi.</p>
+
+      <input id="firstName" class="field" placeholder="Prénom" />
+      <input id="lastName" class="field" placeholder="Nom" />
+      <input id="email" class="field" type="email" placeholder="Email" />
+      <input id="password" class="field" type="password" placeholder="Mot de passe (6+)" />
+
+      <button id="btnSignup" class="btn orange">Créer mon compte</button>
+      <p class="msg" id="msg"></p>
+
+      <p style="margin-top:12px;color:var(--muted)">
+        Déjà inscrit ? <a href="./login.html">Se connecter</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
+      authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
+      projectId: "maison-des-jeunes-cteen-yerres",
+      storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
+      messagingSenderId: "473890667192",
+      appId: "1:473890667192:web:973af383f7319d2cdc124d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const msg = document.getElementById("msg");
+    function setMsg(text, cls=""){ msg.className = "msg " + cls; msg.textContent = text; }
+
+    document.getElementById("btnSignup").onclick = async () => {
+      setMsg("");
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if(!firstName || !lastName) return setMsg("Nom + prénom obligatoires.", "bad");
+
+      try{
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
+
+        // doc étudiant = uid
+        await setDoc(doc(db, "students", uid), {
+          firstName, lastName,
+          email,
+          totalCheckins: 0,
+          lastCheckinDate: null,
+          createdAt: serverTimestamp()
+        });
+
+        setMsg("Compte créé ✅ Redirection…", "ok");
+        setTimeout(()=> location.href = "./me.html", 600);
+      }catch(e){
+        setMsg("Erreur: " + (e?.code ?? "") + " " + (e?.message ?? e), "bad");
+      }
+    };
+  </script>
+</body>
+</html>
