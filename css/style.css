@@ -266,9 +266,17 @@ a:hover{ text-decoration:underline; }
 
 .grid{
   display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
- 
+  grid-template-columns: 1fr;   /* ✅ par défaut = 1 colonne */
+  gap:12px;
+  margin-top:12px;
+}
+
+/* ✅ 2 colonnes uniquement si on ajoute .two (et seulement sur grand écran) */
+@media (min-width: 900px){
+  .grid.two{
+    grid-template-columns: 1fr 1fr;
+    align-items:start;
+  }
 }
 
 .row{
