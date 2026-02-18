@@ -162,52 +162,82 @@ document.getElementById("btnInvite").onclick = async ()=>{
 /* =========================
    LOAD STUDENTS (FIXED)
 ========================= */
-cards.innerHTML = `<div class="sCard"><div class="sName">Chargement...</div></div>`;
 async function loadStudents(){
-
   const tbody = document.getElementById("students");
+  const cards = document.getElementById("cards");
+
+  // sécurité DOM
+  if(!tbody || !cards){
+    console.error("DOM manquant:", { tbody: !!tbody, cards: !!cards });
+    return;
+  }
+
+  // état "chargement"
   tbody.innerHTML = "";
+  cards.innerHTML = `<div class="sCard"><div class="sName">Chargement…</div></div>`;
 
   try{
+    console.log("loadStudents() start ✅");
+
     const snap = await getDocs(collection(db,"students"));
 
-    if(snap.empty){
-      cards.innerHTML = `
-        <div class="sCard">
-          <div class="sName">Aucun étudiant</div>
-          <div class="sMeta">Soit la liste est vide, soit tu n'as pas accès.</div>
-          
-          <td colspan="4">Aucun étudiant trouvé.</td>
-        </tr>
-      `;
-      return;
-    }
+    // reset si ok
+    tbody.innerHTML = "";
+    cards.innerHTML = "";
+
+    const base = location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
 
     snap.forEach(docu=>{
       const d = docu.data();
       const total = d.totalCheckins || 0;
       const rewards = Math.floor(total/20);
 
+      const cardLink = `${base}student.html?sid=${encodeURIComponent(docu.id)}`;
+      const qrPayload = `SID:${docu.id}`;
+      const qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`;
+
+      // Desktop row
       tbody.innerHTML += `
         <tr>
-          <td>${d.lastName ?? ""} ${d.firstName ?? ""}</td>
-          <td>${total}</td>
-          <td>${rewards}</td>
+          <td class="name">${(d.lastName ?? "")} ${(d.firstName ?? "")}</td>
+          <td class="num">${total}</td>
+          <td class="num">${rewards}</td>
           <td>
-            <a href="./student.html?sid=${docu.id}" target="_blank">
-              Carte
-            </a>
+            <img class="qrImg" src="${qr}" alt="QR">
+            <div class="miniLink"><a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a></div>
           </td>
         </tr>
       `;
+
+      // Mobile card
+      cards.innerHTML += `
+        <div class="sCard">
+          <div class="sTop">
+            <div>
+              <div class="sName">${(d.lastName ?? "")} ${(d.firstName ?? "")}</div>
+              <div class="sMeta">Présences: <span class="num">${total}</span> • Récompenses: <span class="num">${rewards}</span></div>
+            </div>
+            <img class="qrImg" src="${qr}" alt="QR">
+          </div>
+          <div class="sActions">
+            <a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a>
+          </div>
+        </div>
+      `;
     });
 
+    if(snap.empty){
+      cards.innerHTML = `<div class="sCard"><div class="sName">Aucun étudiant</div></div>`;
+    }
+
+    console.log("loadStudents() done ✅", snap.size);
   }catch(e){
-    console.error("ERREUR LOAD:", e);
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="4">Erreur Firestore.</td>
-      </tr>
+    console.error("loadStudents() ERROR ❌", e);
+    cards.innerHTML = `
+      <div class="sCard">
+        <div class="sName">Erreur chargement ❌</div>
+        <div class="sMeta">${(e?.message ?? e)}</div>
+      </div>
     `;
   }
 }
