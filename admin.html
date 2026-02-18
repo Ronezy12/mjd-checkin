@@ -96,6 +96,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+/* =========================
+   FIREBASE INIT
+========================= */
+
 const firebaseConfig = {
   apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
   authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
@@ -109,33 +113,25 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ======================
-   UI
-====================== */
+/* =========================
+   UI REFERENCES
+========================= */
 
 const loginBox = document.getElementById("loginBox");
-const listBox = document.getElementById("listBox");
+const listBox  = document.getElementById("listBox");
 
-const pillText = document.getElementById("pillText");
-const dot = document.getElementById("dot");
-
-const btnLogin = document.getElementById("btnLogin");
+const btnLogin  = document.getElementById("btnLogin");
 const btnLogout = document.getElementById("btnLogout");
-const goScan = document.getElementById("goScan");
+const goScan    = document.getElementById("goScan");
 
-const loginMsg = document.getElementById("loginMsg");
+const pillText  = document.getElementById("pillText");
+const dot       = document.getElementById("dot");
 
-/* ======================
-   SHOW PASSWORD
-====================== */
+const loginMsg  = document.getElementById("loginMsg");
 
-document.getElementById("showPass").addEventListener("change", e=>{
-  document.getElementById("password").type = e.target.checked ? "text" : "password";
-});
-
-/* ======================
+/* =========================
    LOGIN
-====================== */
+========================= */
 
 btnLogin.onclick = async ()=>{
   loginMsg.textContent = "";
@@ -151,65 +147,71 @@ btnLogin.onclick = async ()=>{
   }
 };
 
-/* ======================
-   LOGOUT
-====================== */
-
 btnLogout.onclick = ()=> signOut(auth);
 
-/* ======================
-   INVITE LINK
-====================== */
+/* =========================
+   INVITE BUTTON
+========================= */
 
 document.getElementById("btnInvite").onclick = async ()=>{
-  const link = location.origin + location.pathname.replace(/\/admin\.html$/, "/");
-
-  if(navigator.share){
-    try{
-      await navigator.share({
-        title:"CTeen Yerres",
-        text:"Rejoins-nous 👇",
-        url:link
-      });
-      return;
-    }catch{}
-  }
-
+  const link = location.origin + "/";
   await navigator.clipboard.writeText(link);
   alert("Lien copié ✅\n\n" + link);
 };
 
-/* ======================
-   LOAD STUDENTS
-====================== */
+/* =========================
+   LOAD STUDENTS (FIXED)
+========================= */
 
 async function loadStudents(){
+
   const tbody = document.getElementById("students");
   tbody.innerHTML = "";
 
-  const snap = await getDocs(collection(db,"students"));
+  try{
+    const snap = await getDocs(collection(db,"students"));
 
-  snap.forEach(docu=>{
-    const d = docu.data();
-    const total = d.totalCheckins || 0;
-    const rewards = Math.floor(total/20);
+    if(snap.empty){
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4">Aucun étudiant trouvé.</td>
+        </tr>
+      `;
+      return;
+    }
 
-    tbody.innerHTML += `
+    snap.forEach(docu=>{
+      const d = docu.data();
+      const total = d.totalCheckins || 0;
+      const rewards = Math.floor(total/20);
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${d.lastName ?? ""} ${d.firstName ?? ""}</td>
+          <td>${total}</td>
+          <td>${rewards}</td>
+          <td>
+            <a href="./student.html?sid=${docu.id}" target="_blank">
+              Carte
+            </a>
+          </td>
+        </tr>
+      `;
+    });
+
+  }catch(e){
+    console.error("ERREUR LOAD:", e);
+    tbody.innerHTML = `
       <tr>
-        <td>${d.lastName ?? ""} ${d.firstName ?? ""}</td>
-        <td>${total}</td>
-        <td>${rewards}</td>
-        <td><a href="./student.html?sid=${docu.id}" target="_blank">Voir</a></td>
+        <td colspan="4">Erreur Firestore.</td>
       </tr>
     `;
-  });
+  }
 }
 
-document.getElementById("btnRefresh").onclick = loadStudents;
-
-/* ======================
+/* =========================
    AUTH STATE
-====================== */
+========================= */
 
 onAuthStateChanged(auth, async (user)=>{
 
@@ -225,15 +227,15 @@ onAuthStateChanged(auth, async (user)=>{
     return;
   }
 
-  const snap = await getDoc(doc(db,"admins",user.uid));
+  const adminSnap = await getDoc(doc(db,"admins",user.uid));
 
-  if(!snap.exists()){
+  if(!adminSnap.exists()){
     pillText.textContent = "Non autorisé";
     dot.classList.remove("ok");
     return;
   }
 
-  // ✅ ADMIN CONNECTÉ
+  // ✅ ADMIN OK
   pillText.textContent = "Admin: " + user.email;
   dot.classList.add("ok");
 
