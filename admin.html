@@ -5,19 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin — CTeen Check-in</title>
 
-  <!-- CSS centralisé -->
   <link rel="stylesheet" href="./css/style.css">
-
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 
 <body>
-<div class="wrap">
+
+<div class="wrap-admin">
+
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="brand">
       <div class="title">CTeen — Admin</div>
@@ -29,79 +30,103 @@
         <span class="dot" id="dot"></span>
         <span id="pillText">Non connecté</span>
       </span>
-      <a class="btn ghost" href="./scan.html" id="goScan" style="display:none;">📷 Scanner</a>
-      <button class="btn orange" id="btnLogout" style="display:none;">Déconnexion</button>
+
+      <a class="btn ghost" href="./scan.html" id="goScan" style="display:none;">
+        📷 Scanner
+      </a>
+
+      <button class="btn orange" id="btnLogout" style="display:none;">
+        Déconnexion
+      </button>
     </div>
   </div>
 
-  <div class="grid">
-    <!-- Login -->
-    <section class="card" id="loginBox">
-      <h2>Connexion admin</h2>
-      <p class="hint">Connecte-toi pour accéder au scan et au dashboard.</p>
+  <!-- GRID DASHBOARD -->
+  <div class="adminGrid">
 
-      <input class="field" id="email" type="email" placeholder="Email"
-             autocomplete="email" inputmode="email" enterkeyhint="next">
-      <input class="field" id="password" type="password" placeholder="Mot de passe"
-             autocomplete="current-password" enterkeyhint="go">
+    <!-- COLONNE GAUCHE -->
+    <div class="adminLeft">
 
-      <label style="display:flex;gap:10px;align-items:center;margin-top:10px;color:var(--muted);font-size:13px;">
-        <input id="showPass" type="checkbox">
-        Afficher le mot de passe
-      </label>
+      <!-- LOGIN -->
+      <section class="card" id="loginBox">
+        <h2>Connexion admin</h2>
+        <p class="muted">Connecte-toi pour gérer les étudiants.</p>
 
-      <button class="btn orange" id="btnLogin">Se connecter</button>
-      <p class="msg" id="loginMsg"></p>
-    </section>
+        <input class="field" id="email" type="email" placeholder="Email">
+        <input class="field" id="password" type="password" placeholder="Mot de passe">
 
-    <!-- Admin tools -->
-    <section class="card" id="adminBox" style="display:none;">
-      <h2>Outils admin</h2>
-      <p class="hint">
-        Les étudiants créent leur compte via <b>signup.html</b>.
-        Ici tu gères la liste + l’accès scan.
-      </p>
+        <label class="toggle mt10">
+          <input id="showPass" type="checkbox">
+          Afficher le mot de passe
+        </label>
 
-      <div class="row" style="margin-top:10px;">
-        <input class="field" id="signupLink" readonly value="">
-        <button class="btn" id="btnCopy">Copier le lien</button>
-      </div>
+        <button class="btn orange w100 mt10" id="btnLogin">
+          Se connecter
+        </button>
 
-      <p class="msg muted" id="adminStatus"></p>
-    </section>
+        <p class="msg" id="loginMsg"></p>
+      </section>
+
+      <!-- CREATE STUDENT -->
+      <section class="card mt10" id="adminBox" style="display:none;">
+        <h2>Créer un étudiant</h2>
+        <p class="muted">Ajoute un étudiant manuellement.</p>
+
+        <div class="row mt10">
+          <input class="field" id="firstName" placeholder="Prénom">
+          <input class="field" id="lastName" placeholder="Nom">
+        </div>
+
+        <button class="btn w100 mt10" id="btnCreate">
+          Créer
+        </button>
+
+        <p class="msg muted" id="adminStatus"></p>
+      </section>
+
+    </div>
+
+    <!-- COLONNE DROITE -->
+    <div class="adminList">
+
+      <section class="card" id="listBox" style="display:none;">
+        <div class="rowBetween">
+          <div>
+            <h2 class="h1">Étudiants</h2>
+            <p class="muted tiny">Tableau desktop • Cartes mobile</p>
+          </div>
+
+          <button class="btn ghost" id="btnRefresh">
+            ↻ Rafraîchir
+          </button>
+        </div>
+
+        <!-- TABLE DESKTOP -->
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Présences</th>
+                <th>Récompenses</th>
+                <th>Carte (QR)</th>
+              </tr>
+            </thead>
+            <tbody id="students"></tbody>
+          </table>
+        </div>
+
+        <!-- MOBILE CARDS -->
+        <div class="cards" id="cards"></div>
+
+      </section>
+
+    </div>
+
   </div>
-
-  <!-- List -->
-  <section class="card" id="listBox" style="display:none; margin-top:12px;">
-    <div class="row" style="justify-content:space-between; align-items:center;">
-      <div style="flex:1; min-width:200px">
-        <h2 style="margin:0;">Étudiants</h2>
-        <p class="hint">Desktop : tableau • Mobile : cartes</p>
-      </div>
-      <div style="flex:0">
-        <button class="btn ghost" id="btnRefresh">↻ Rafraîchir</button>
-      </div>
-    </div>
-
-    <div class="tableWrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Présences</th>
-            <th>Récompenses</th>
-            <th>Carte (QR)</th>
-          </tr>
-        </thead>
-        <tbody id="students"></tbody>
-      </table>
-    </div>
-
-    <div class="cards" id="cards"></div>
-  </section>
 </div>
 
-<!-- Mobile sticky actions -->
+<!-- BOTTOM BAR MOBILE -->
 <div class="bottomBar" id="bottomBar" style="display:none;">
   <div class="inner">
     <a class="btn ghost" href="./scan.html">📷 Scanner</a>
@@ -109,212 +134,10 @@
   </div>
 </div>
 
-<script>
-  // SW register (pas dans le <head>)
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
-</script>
-
+<!-- ⚠️ GARDE TON SCRIPT FIREBASE ICI EXACTEMENT COMME TU L’AS -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
-    authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
-    projectId: "maison-des-jeunes-cteen-yerres",
-    storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
-    messagingSenderId: "473890667192",
-    appId: "1:473890667192:web:973af383f7319d2cdc124d"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // UI refs
-  const loginBox = document.getElementById("loginBox");
-  const adminBox = document.getElementById("adminBox");
-  const listBox  = document.getElementById("listBox");
-  const grid     = document.querySelector ("grid");
-
-  const pillText = document.getElementById("pillText");
-  const dot = document.getElementById("dot");
-  const goScan = document.getElementById("goScan");
-  const btnLogout = document.getElementById("btnLogout");
-  const btnLogout2 = document.getElementById("btnLogout2");
-  const bottomBar = document.getElementById("bottomBar");
-
-  const loginMsg = document.getElementById("loginMsg");
-  const adminStatus = document.getElementById("adminStatus");
-
-  // show password
-  document.getElementById("showPass").addEventListener("change", (e)=>{
-    document.getElementById("password").type = e.target.checked ? "text" : "password";
-  });
-
-  function setPill(state, text){
-    pillText.textContent = text;
-    dot.classList.remove("ok","bad");
-    if(state==="ok") dot.classList.add("ok");
-    if(state==="bad") dot.classList.add("bad");
-  }
-
-  async function isAdmin(uid){
-    const snap = await getDoc(doc(db,"admins",uid));
-    return snap.exists();
-  }
-
-  function setLoginError(e){
-    loginMsg.className = "msg bad";
-    loginMsg.textContent = "Erreur: " + (e?.code ?? "") + " " + (e?.message ?? e);
-  }
-
-  // login
-  document.getElementById("btnLogin").onclick = async ()=>{
-    loginMsg.className = "msg";
-    loginMsg.textContent = "";
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    const btn = document.getElementById("btnLogin");
-    btn.disabled = true;
-    btn.textContent = "Connexion…";
-    try{
-      await signInWithEmailAndPassword(auth, email, password);
-    }catch(e){
-      setLoginError(e);
-    }finally{
-      btn.disabled = false;
-      btn.textContent = "Se connecter";
-    }
-  };
-
-  async function doLogout(){ await signOut(auth); }
-  btnLogout.onclick = doLogout;
-  btnLogout2.onclick = doLogout;
-
-  // signup link (students self-create)
-  function setSignupLink(){
-    const base = location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
-    const link = base + "signup.html";
-    document.getElementById("signupLink").value = link;
-  }
-  document.getElementById("btnCopy").onclick = async ()=>{
-    const v = document.getElementById("signupLink").value;
-    try{ await navigator.clipboard.writeText(v); adminStatus.className="msg ok"; adminStatus.textContent="Lien copié ✅"; }
-    catch{ adminStatus.className="msg bad"; adminStatus.textContent="Copie impossible (navigateur)."; }
-  };
-
-  document.getElementById("btnRefresh").onclick = loadStudents;
-
-  // list students
-  async function loadStudents(){
-    const tbody = document.getElementById("students");
-    const cards = document.getElementById("cards");
-    tbody.innerHTML = "";
-    cards.innerHTML = "";
-
-    const snap = await getDocs(collection(db,"students"));
-    const base = location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
-
-    snap.forEach(docu=>{
-      const d = docu.data();
-      const total = d.totalCheckins || 0;
-      const rewards = Math.floor(total/20);
-
-      const cardLink = `${base}student.html?sid=${encodeURIComponent(docu.id)}`;
-      const qrPayload = `SID:${docu.id}`;
-      const qr = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`;
-
-      tbody.innerHTML += `
-        <tr>
-          <td class="name">${(d.lastName ?? "")} ${(d.firstName ?? "")}</td>
-          <td class="num">${total}</td>
-          <td class="num">${rewards}</td>
-          <td>
-            <img class="qrImg" src="${qr}" alt="QR">
-            <div class="miniLink"><a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a></div>
-          </td>
-        </tr>
-      `;
-
-      cards.innerHTML += `
-        <div class="sCard">
-          <div class="sTop">
-            <div>
-              <div class="sName">${(d.lastName ?? "")} ${(d.firstName ?? "")}</div>
-              <div class="sMeta">Présences: <span class="num">${total}</span> • Récompenses: <span class="num">${rewards}</span></div>
-            </div>
-            <img class="qrImg" src="${qr}" alt="QR">
-          </div>
-          <div class="sActions">
-            <a href="${cardLink}" target="_blank" rel="noreferrer">Carte étudiant</a>
-          </div>
-        </div>
-      `;
-    });
-  }
-
-  // auth state
-  onAuthStateChanged(auth, async (user)=>{
-    
-    if(!user){
-      setPill("", "Non connecté");
-      goScan.style.display = "none";
-      btnLogout.style.display = "none";
-      bottomBar.style.display = "none";
-
-      loginBox.style.display = "block";
-      adminBox.style.display = "none";
-      listBox.style.display  = "none";
-
-      grid.classicList.remove("two");
-
-      adminStatus.textContent = "";
-      document.getElementById("email").focus();
-      return;
-    }
-
-    setPill("", user.email ?? user.uid);
-
-    const ok = await isAdmin(user.uid);
-    if(!ok){
-      setPill("bad", "Non autorisé");
-      goScan.style.display = "none";
-      btnLogout.style.display = "inline-flex";
-      bottomBar.style.display = "block";
-
-      loginBox.style.display = "block";
-      adminBox.style.display = "none";
-      listBox.style.display  = "none";
-
-      grid.classicList.remove("two");
-
-      adminStatus.className = "msg bad";
-      adminStatus.textContent = "Compte connecté mais pas admin (UID absent dans /admins).";
-      return;
-    }
-
-    setPill("ok", `Admin: ${user.email ?? user.uid}`);
-    goScan.style.display = "inline-flex";
-    btnLogout.style.display = "inline-flex";
-    bottomBar.style.display = "block";
-
-    loginBox.style.display = "none";
-    adminBox.style.display = "block";
-    listBox.style.display  = "block";
-
-    grid.classicList.add("two");
-
-    setSignupLink();
-    adminStatus.className = "msg ok";
-    adminStatus.textContent = "Connecté ✅";
-    await loadStudents();
-  });
+  /* COLLE ICI TON SCRIPT FIREBASE EXACT */
 </script>
+
 </body>
 </html>
