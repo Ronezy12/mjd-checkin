@@ -1,10 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin - MJD Check-in</title>
+<style>
+body{font-family:Arial;margin:20px;max-width:900px}
+input,button{padding:8px;margin:5px}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #ddd;padding:8px}
+.ok{color:green}
+.bad{color:red}
+</style>
+</head>
+<body>
+
+<h1>Admin</h1>
+
+<div id="loginBox">
+  <h3>Connexion</h3>
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Mot de passe">
+  <button onclick="login()">Se connecter</button>
+  <p id="loginMsg"></p>
+</div>
+
+<div id="adminBox" style="display:none">
+  <p id="adminStatus"></p>
+  <button onclick="logout()">Déconnexion</button>
+
+  <h3>Créer un étudiant</h3>
+  <input id="firstName" placeholder="Prénom">
+  <input id="lastName" placeholder="Nom">
+  <button onclick="createStudent()">Créer</button>
+
+  <h3>Liste étudiants</h3>
+  <button onclick="loadStudents()">Rafraîchir</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Présences</th>
+        <th>QR</th>
+      </tr>
+    </thead>
+    <tbody id="students"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAbnHtXih9wlT361KeoSTRccC0vWd_9fs4",
   authDomain: "maison-des-jeunes-cteen-yerres.firebaseapp.com",
   projectId: "maison-des-jeunes-cteen-yerres",
   storageBucket: "maison-des-jeunes-cteen-yerres.firebasestorage.app",
   messagingSenderId: "473890667192",
-  appId: "1:473890667192:web:973af383f7319d2cdc124d",
-  measurementId: "G-TF788MYR3N"
+  appId: "1:473890667192:web:973af383f7319d2cdc124d"
 };
 
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.login = async function(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  try{
+    await signInWithEmailAndPassword(auth,email,password);
+  }catch(e){
+    document.getElementById("loginMsg").innerText="Erreur connexion";
+  }
+}
+
+window.logout = async function(){
+  await signOut(auth);
+}
+
+async function isAdmin(uid){
+  const snap = await getDoc(doc(db,"admins",uid));
+  return snap.exists();
+}
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    loginBox.style.display="block";
+    adminBox.style.display="none";
+    return;
+  }
+
+  if(await isAdmin(user.uid)){
+    loginBox.style.display="none";
+    adminBox.style.display="block";
+    adminStatus.innerHTML="<span class='ok'>ADMIN connecté</span>";
+    loadStudents();
+  }else{
+    adminStatus.innerHTML="<span class='bad'>Non autorisé</span>";
+  }
+});
+
+window.createStudent = async function(){
+  const firstName=document.getElementById("firstName").value;
+  const lastName=document.getElementById("lastName").value;
+  if(!firstName||!lastName)return alert("Nom et prénom obligatoires");
+
+  await addDoc(collection(db,"students"),{
+    firstName,lastName,
+    totalCheckins:0,
+    lastCheckinDate:null,
+    createdAt:serverTimestamp()
+  });
+
+  alert("Étudiant créé");
+  loadStudents();
+}
+
+window.loadStudents = async function(){
+  const tbody=document.getElementById("students");
+  tbody.innerHTML="";
+  const snap=await getDocs(collection(db,"students"));
+  snap.forEach(docu=>{
+    const d=docu.data();
+    const link=location.origin+location.pathname.replace("admin.html","")+"scan.html?sid="+docu.id;
+    const qr="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data="+encodeURIComponent(link);
+
+    tbody.innerHTML+=`
+      <tr>
+        <td>${d.lastName} ${d.firstName}</td>
+        <td>${d.totalCheckins||0}</td>
+        <td><img src="${qr}"><br><a href="${link}" target="_blank">Lien</a></td>
+      </tr>
+    `;
+  });
+}
+</script>
+</body>
+</html>
