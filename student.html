@@ -4,133 +4,66 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Carte étudiant — CTeen</title>
-  <style>
-    :root{
-      --bg:#0b1220;
-      --card:#0f1b33;
-      --line:rgba(255,255,255,.10);
-      --text:#eaf0ff;
-      --muted:rgba(234,240,255,.72);
-      --blue:#2f6bff;
-      --orange:#ff8a1f;
-      --shadow: 0 16px 50px rgba(0,0,0,.35);
-      --r:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(900px 520px at 15% 0%, rgba(47,107,255,.22), transparent 60%),
-        radial-gradient(900px 520px at 90% 20%, rgba(255,138,31,.18), transparent 60%),
-        var(--bg);
-    }
-    .wrap{max-width:820px;margin:0 auto;padding:22px 16px 40px}
-    .card{
-      border:1px solid var(--line);
-      background: rgba(15,27,51,.78);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      padding:18px;
-      backdrop-filter: blur(10px);
-    }
-    .top{
-      display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .brand{
-      display:flex; flex-direction:column; gap:6px;
-    }
-    .badge{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:10px 12px; border-radius:999px;
-      border:1px solid var(--line); background: rgba(0,0,0,.18);
-      font-weight:800; letter-spacing:.3px;
-    }
-    .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(135deg,var(--blue),var(--orange))}
-    h1{margin:0;font-size:18px}
-    p{margin:0;color:var(--muted);line-height:1.35}
-    .grid{
-      margin-top:14px;
-      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
-    }
-    @media(max-width:720px){ .grid{grid-template-columns:1fr} }
-    .pane{
-      border:1px solid var(--line);
-      background: rgba(11,18,32,.35);
-      border-radius:16px;
-      padding:14px;
-    }
-    .name{
-      font-size:22px; font-weight:900; letter-spacing:.2px;
-    }
-    .sub{margin-top:6px;font-size:13px;color:var(--muted)}
-    .qrWrap{
-      display:flex; justify-content:center; align-items:center;
-      padding:14px;
-    }
-    .qr{
-      width: min(320px, 80vw);
-      aspect-ratio:1/1;
-      border-radius:20px;
-      border:1px solid var(--line);
-      background:white;
-      display:block;
-    }
-    .hint{
-      margin-top:10px;
-      font-size:13px;
-      color:var(--muted);
-    }
-    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{
-      appearance:none; border:1px solid var(--line);
-      padding:10px 12px; border-radius:14px;
-      background: rgba(47,107,255,.22);
-      color:var(--text); font-weight:800;
-      cursor:pointer;
-    }
-    .btn.orange{background: rgba(255,138,31,.20)}
-    .btn:active{transform:translateY(1px)}
-    code{color:#b9ccff}
-  </style>
+
+  <!-- CSS centralisé -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- PWA (optionnel mais cohérent) -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
+
 <body>
-  <div class="wrap">
+  <div class="wrap wrap-student">
     <div class="card">
-      <div class="top">
-        <div class="brand">
-          <div class="badge"><span class="dot"></span> CTeen — Carte étudiant</div>
-          <h1>Présente ce QR à l’admin</h1>
-          <p>Le QR contient ton identifiant et sert à valider ta présence.</p>
+      <div class="topStudent">
+        <div class="brandStudent">
+          <div class="badge"><span class="brandDot"></span> CTeen — Carte étudiant</div>
+          <h1 class="h1">Présente ce QR à l’admin</h1>
+          <p class="muted">Le QR contient ton identifiant et sert à valider ta présence.</p>
         </div>
       </div>
 
-      <div class="grid">
+      <div class="studentGrid">
         <div class="pane">
-          <div class="name" id="fullName">Chargement…</div>
-          <div class="sub">ID: <code id="sid">—</code></div>
-          <div class="hint">
+          <div class="nameBig" id="fullName">Chargement…</div>
+          <div class="subLine">ID: <code id="sid">—</code></div>
+
+          <div class="muted mt10">
             Astuce : garde cette page en favori sur ton téléphone.
           </div>
+
           <div class="btnRow">
-            <button class="btn" onclick="window.print()">🖨️ Imprimer</button>
-            <a class="btn orange" href="./scan.html" style="text-decoration:none;display:inline-flex;align-items:center;">Admin scan</a>
+            <button class="btn ghost" id="btnPrint" type="button">🖨️ Imprimer</button>
+            <a class="btn orange" href="./scan.html" style="text-decoration:none;display:inline-flex;align-items:center;">
+              Admin scan
+            </a>
           </div>
         </div>
 
         <div class="pane">
           <div class="qrWrap">
-            <img id="qrImg" class="qr" alt="QR étudiant" />
+            <div class="qrFrame">
+              <img id="qrImg" class="qr" alt="QR étudiant" />
+            </div>
           </div>
-          <div class="hint">
+          <div class="muted mt10">
             Si l’admin scanne, ta présence est validée (max 1 fois par jour).
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Service worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    }
+  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -155,46 +88,41 @@
     const nameEl = document.getElementById("fullName");
     const qrImg = document.getElementById("qrImg");
 
-    function basePath(){
-      return location.origin + location.pathname.replace(/\/[^\/]*$/, "/");
+    document.getElementById("btnPrint").onclick = ()=> window.print();
+
+    function setQrAlways(id){
+      const payload = `SID:${id}`;
+      const url1 = `https://api.qrserver.com/v1/create-qr-code/?size=700x700&data=${encodeURIComponent(payload)}`;
+      const url2 = `https://quickchart.io/qr?size=700&text=${encodeURIComponent(payload)}`;
+      qrImg.src = url1;
+      qrImg.onerror = ()=> { qrImg.src = url2; };
     }
 
-    function setQrAlways(sid){
-  // QR encode juste SID:<id>
-  const payload = `SID:${sid}`;
-  const qr = `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(payload)}`;
-  qrImg.src = qr;
-}
+    async function main(){
+      if(!sid){
+        nameEl.textContent = "ID manquant";
+        sidEl.textContent = "—";
+        return;
+      }
 
-async function main(){
-  if(!sid){
-    nameEl.textContent = "ID manquant";
-    sidEl.textContent = "—";
-    return;
-  }
+      sidEl.textContent = sid;
+      setQrAlways(sid);
 
-  sidEl.textContent = sid;
-
-  // ✅ QR affiché quoi qu’il arrive
-  setQrAlways(sid);
-
-  // 🔒 Tentative d’afficher le nom (peut échouer si pas admin)
-  try{
-    const snap = await getDoc(doc(db,"students",sid));
-    if(!snap.exists()){
-      nameEl.textContent = "Étudiant introuvable";
-      return;
+      // Tentative d’afficher le nom (peut échouer si rules bloquent)
+      try{
+        const snap = await getDoc(doc(db,"students",sid));
+        if(!snap.exists()){
+          nameEl.textContent = "Étudiant introuvable";
+          return;
+        }
+        const d = snap.data();
+        nameEl.textContent = `${d.lastName ?? ""} ${d.firstName ?? ""}`.trim() || "Étudiant";
+      }catch{
+        nameEl.textContent = "Carte étudiant";
+      }
     }
-    const d = snap.data();
-    nameEl.textContent = `${d.lastName ?? ""} ${d.firstName ?? ""}`.trim() || "Étudiant";
-  }catch(e){
-    // Pas admin => permissions → on garde un affichage neutre
-    nameEl.textContent = "Carte étudiant";
-  }
-}
 
-main();
-    
-    </script>
-  </body>
-  </html>
+    main();
+  </script>
+</body>
+</html>
