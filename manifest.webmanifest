@@ -1,8 +1,8 @@
 {
   "name": "CTeen Check-in",
   "short_name": "CTeen",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/mjd-checkin",
+  "scope": "/mjd-checkin",
   "display": "standalone",
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
